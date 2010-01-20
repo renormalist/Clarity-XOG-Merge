@@ -1,0 +1,43 @@
+XOG-Merge
+
+Merge several Clarity XOG files into one in order to maintain them
+separately but import centrally.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc XOG::Merge
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=XOG-Merge
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/XOG-Merge
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/XOG-Merge
+
+    Search CPAN
+        http://search.cpan.org/dist/XOG-Merge/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2011 Steffen Schwigon
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
