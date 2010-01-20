@@ -7,6 +7,7 @@ license  'perl';
 
 build_requires 'Test::More';
 requires 'XML::Twig';
+requires 'MooseX::Declare';
 
 auto_install;
 
