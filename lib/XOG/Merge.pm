@@ -1,36 +1,71 @@
 use MooseX::Declare;
 
+use 5.010;
+
 class XOG::Merge {
 
         use XML::Twig;
         use Data::Dumper;
 
-        has files => ( is  => "rw", default => sub { [qw't/IM_write.xml'] } );
+        our %projectids;
+        our $cur_file;
 
-        sub Project
-        {
-                my( $t, $project) = @_;
+        has files => ( is         => "rw",
+                       isa        => "ArrayRef",
+                       auto_deref => 1,
+                       default    => sub { ['t/QA.xml', 't/SW.xml', 't/BSFZ.xml'] },
+                     );
+
+        #has projectids => ( is  => "rw", default => sub { [] } );
+
+        method HEADER {
+                q[
+<NikuDataBus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nikuxog_project.xsd">
+	<Header action="write" externalSource="NIKU" objectType="project" version="7.5.0"/>
+	<Projects>
+];
         }
 
-        sub AllocCurve
+        method FOOTER {
+                q[
+	</Projects>
+</NikuDataBus>
+
+];
+        }
+
+        sub cb_Collect_Project
         {
-                my( $t, $alloc)= @_;
+                my ($t, $project) = @_;
+
+                my $projectID = $project->att('projectID');
+                my $name      = $project->att('name');
+
+                push @{$projectids{$projectID}{files}}, $cur_file;
+                #push @{$projectids{$projectID}{ids}}, $projectID;
+        }
+
+        sub cb_AllocCurve
+        {
+                my ($t, $alloc) = @_;
                 $alloc->erase;
         }
 
         method Main
         {
-                my $twig= XML::Twig->new
-                    ( twig_handlers => {
-                                        'doc'            => \&doc,
-                                        'Projects/Project' => \&Project,
-                                        'AllocCurve'        => \&AllocCurve,
-                                       }
-                    );
-
-                $twig->parsefile( $self->files->[0] ); # build the twig
-                $twig->set_pretty_print( 'nice');     # \n before tags not part of mixed content
-                $twig->print;
+                foreach my $f ($self->files) {
+                        $cur_file = $f;
+                        my $twig= XML::Twig->new
+                            ( twig_handlers => {
+                                                'Projects/Project' => \&cb_Collect_Project,
+                                                'AllocCurve'       => \&cb_AllocCurve,
+                                               }
+                            );
+                        $twig->parsefile( $f ); # build the twig
+                        $twig->set_pretty_print( 'nice');     # \n before tags not part of mixed content
+                        #$twig->print;
+                }
+                print Dumper(\%projectids);
         }
 
 }
