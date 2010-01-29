@@ -1,0 +1,22 @@
+-*- mode: org -*-
+
+* TODO Algorithm
+*** Annahme: n=3 files
+*** goal: 1+n pass maximum
+***** collect project/file mapping
+***** know which project in which files
+***** pass 1:
+******* file 1: collect all projects with 1 file
+******* file 2: collect all projects with 1 file
+******* file 3: collect all projects with 1 file
+***** pass 2:
+******* file 1: collect all projects with 2 files and file=1
+******* file 2: collect all projects with 2 files
+******* file 3: collect all projects with 2 files
+***** pass 3:  
+******* file 1: collect all projects with 3 files
+******* file 2: collect all projects with 3 files
+******* file 3: collect all projects with 3 files
+* TODO Project/CustomInformation?
+*** multiple?
+*** 
