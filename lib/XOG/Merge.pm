@@ -7,16 +7,9 @@ class XOG::Merge {
         use XML::Twig;
         use Data::Dumper;
 
-        our %projectids;
-        our $cur_file;
-
-        has files => ( is         => "rw",
-                       isa        => "ArrayRef",
-                       auto_deref => 1,
-                       default    => sub { ['t/QA.xml', 't/SW.xml', 't/BSFZ.xml'] },
-                     );
-
-        #has projectids => ( is  => "rw", default => sub { [] } );
+        has files      => ( is => "rw", isa => "ArrayRef", auto_deref => 1, default => sub {['t/QA.xml', 't/PS.xml', 't/TJ.xml']} );
+        has projectids => ( is => "rw", isa => "HashRef", default => sub {{}} );
+        has cur_file   => ( is => "rw" );
 
         method HEADER {
                 q[
@@ -37,12 +30,12 @@ class XOG::Merge {
         sub cb_Collect_Project
         {
                 my ($t, $project) = @_;
+                my $self = $t->{_self};
 
                 my $projectID = $project->att('projectID');
                 my $name      = $project->att('name');
 
-                push @{$projectids{$projectID}{files}}, $cur_file;
-                #push @{$projectids{$projectID}{ids}}, $projectID;
+                $self->projectids->{$projectID}{files}{$self->cur_file}++;
         }
 
         sub cb_AllocCurve
@@ -53,19 +46,22 @@ class XOG::Merge {
 
         method Main
         {
+                say STDERR "START";
                 foreach my $f ($self->files) {
-                        $cur_file = $f;
+                        $self->cur_file( $f );
                         my $twig= XML::Twig->new
                             ( twig_handlers => {
                                                 'Projects/Project' => \&cb_Collect_Project,
                                                 'AllocCurve'       => \&cb_AllocCurve,
                                                }
                             );
+                        $twig->{_self} = $self;
                         $twig->parsefile( $f ); # build the twig
                         $twig->set_pretty_print( 'nice');     # \n before tags not part of mixed content
                         #$twig->print;
                 }
-                print Dumper(\%projectids);
+                print Dumper($self->projectids);
+                say STDERR "END";
         }
 
 }
