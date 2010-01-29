@@ -7,9 +7,13 @@ class XOG::Merge {
         use XML::Twig;
         use Data::Dumper;
 
-        has files      => ( is => "rw", isa => "ArrayRef", auto_deref => 1, default => sub {['t/QA.xml', 't/PS.xml', 't/TJ.xml']} );
-        has projectids => ( is => "rw", isa => "HashRef", default => sub {{}} );
-        has cur_file   => ( is => "rw" );
+        has files         => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
+        has projectids    => ( is => "rw", isa => "HashRef",  default => sub {{}} );
+        has cur_file      => ( is => "rw" );
+        has template_file => ( is => "rw", default => "TEMPLATE.xml" );
+        has out_twig      => ( is => "rw" );
+        has out_Projects  => ( is => "rw" );
+        has out_file      => ( is => "rw", default => "OUTFILE.xml" );
 
         method HEADER {
                 q[
@@ -38,30 +42,89 @@ class XOG::Merge {
                 $self->projectids->{$projectID}{files}{$self->cur_file}++;
         }
 
-        sub cb_AllocCurve
-        {
-                my ($t, $alloc) = @_;
-                $alloc->erase;
+        method prepare {
+                # prepare temp dirs
+                # open FINAL
         }
 
-        method Main
+        method finish
         {
-                say STDERR "START";
+                # close FINAL;
+                # cleanup temp dirs
+        }
+
+        # $twig->set_pretty_print( 'indented');     # \n before tags not part of mixed content
+        # $twig->print;
+
+        method pass1_count
+        {
                 foreach my $f ($self->files) {
                         $self->cur_file( $f );
                         my $twig= XML::Twig->new
                             ( twig_handlers => {
                                                 'Projects/Project' => \&cb_Collect_Project,
-                                                'AllocCurve'       => \&cb_AllocCurve,
                                                }
                             );
                         $twig->{_self} = $self;
                         $twig->parsefile( $f ); # build the twig
-                        $twig->set_pretty_print( 'nice');     # \n before tags not part of mixed content
-                        #$twig->print;
                 }
-                print Dumper($self->projectids);
-                say STDERR "END";
+        }
+
+        method add_project_to_final ($el)
+        {
+                $el->paste($self->out_Projects);
+                $el->flush;
+        }
+
+        # sub print_n_purge
+        # {
+        #         my ($t, $elt) = @_;
+        #         $elt->flush;
+        #         #$t->purge;
+        # }
+
+        method prepare_output
+        {
+                open( OUT, ">", $self->out_file) or die "cannot open out file ".$self->out_file.": $!";
+                $self->out_twig(XML::Twig->new
+                                (
+                                 twig_roots               => { }, # "NikuDataBus" => \&print_n_purge },
+                                 twig_print_outside_roots => \*OUT,
+                                ));
+                $self->out_twig->{_self} = $self;
+                $self->out_twig->parsefile( $self->template_file );
+                my $Projects = $self->out_twig->root;# ->first_child('Projects');
+                #print STDERR Dumper($Projects);
+                $self->out_Projects( $Projects );
+        }
+
+        method finish_output
+        {
+                $self->out_Projects->flush;
+        }
+
+        method pass2_merge
+        {
+                $self->prepare_output;
+                for (my $i=0; $i<10; $i++)
+                {
+                        # prepare project
+                        my $el = XML::Twig::Elt->new("Project");
+                        $el->set_att("projectID", "PRJ-".(100_000+$i));
+                        $el->set_att("name", "project$i");
+                        $self->add_project_to_final($el);
+                }
+                $self->finish_output;
+        }
+
+        method Main
+        {
+                $self->prepare();
+                $self->pass1_count;
+                $self->pass2_merge;
+                $self->finish();
+                print "\n"; # XXX: needed as long as it spits out output and confuses TAP
+                # print Dumper($self->projectids);
         }
 
 }
