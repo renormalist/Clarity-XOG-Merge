@@ -25,6 +25,10 @@
 ********* else: stream not on Projects but on Ressources -> probably more passes
 ******* only very few projects spanned over several organisations (TJ,PS,QA)
 ********* else: many bucket files, but still ok
+*********** it's then ok to kill pass-1 and always write to buckets
+************* then we have two other passes:
+               1. collect projects in buckets (former pass-2)
+               2. add_buckets_to_final()
 *********** if not: other approach with 1+n passes
 ************* 1 pass: collect projects per file
 ************* then 1 pass foreach organisation, each pass over all 3 files
@@ -58,8 +62,8 @@
 ********* open(PROJECTFILE)
 ********* $project = new XML_Element("Project")
 ********* xml::twig::callback_Project:
-*********** $project.attr("name",      $cur.attr("name")) unless $project.attr("name");
-*********** $project.attr("projectID", $cur.attr("name")) unless $project.attr("projectID");
+*********** $project.set_att("name",      $cur.att("name")) unless $project.attr("name");
+*********** $project.set_att("projectID", $cur.att("name")) unless $project.attr("projectID");
 *********** foreach $cur.ressources:
 ************* $project.add($resource)
 ********* add_project_to_final($project);
