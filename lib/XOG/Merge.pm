@@ -66,41 +66,49 @@ class XOG::Merge {
                                                }
                             );
                         $twig->{_self} = $self;
-                        $twig->parsefile( $f ); # build the twig
+                        $twig->parsefile( $f );
                 }
         }
 
         method add_project_to_final ($el)
         {
                 $el->paste($self->out_Projects);
-                $el->flush;
+                #$el->flush;
         }
 
-        # sub print_n_purge
-        # {
-        #         my ($t, $elt) = @_;
-        #         $elt->flush;
-        #         #$t->purge;
-        # }
+        sub print_n_purge
+        {
+                my ($t, $elt) = @_;
+                #$elt->flush; # currently prints that strange closing NikuDataBus tag
+                #$t->purge;
+        }
 
         method prepare_output
         {
-                open( OUT, ">", $self->out_file) or die "cannot open out file ".$self->out_file.": $!";
+                #open( OUT, ">", $self->out_file) or die "cannot open out file ".$self->out_file.": $!";
                 $self->out_twig(XML::Twig->new
                                 (
-                                 twig_roots               => { }, # "NikuDataBus" => \&print_n_purge },
-                                 twig_print_outside_roots => \*OUT,
+                                 # twig_roots               => {
+                                 #                              NikuDataBus => \&print_n_purge,
+                                 #                              # Projects    => \&print_n_purge,
+                                 #                              # Project     => \&print_n_purge,
+                                 #                              # Header      => \&print_n_purge,
+                                 #                              # Ressource   => \&print_n_purge,
+                                 #                              # Ressource   => \&print_n_purge,
+                                 #                             },
+                                 # twig_print_outside_roots => \*OUT,
                                 ));
                 $self->out_twig->{_self} = $self;
                 $self->out_twig->parsefile( $self->template_file );
-                my $Projects = $self->out_twig->root;# ->first_child('Projects');
+                my $Projects = $self->out_twig->root->first_child('Projects');
                 #print STDERR Dumper($Projects);
                 $self->out_Projects( $Projects );
         }
 
         method finish_output
         {
-                $self->out_Projects->flush;
+                #$self->out_Projects->flush; # prints to STDOUT for some reason
+                $self->out_twig->flush;
         }
 
         method pass2_merge
@@ -119,7 +127,7 @@ class XOG::Merge {
 
         method Main
         {
-                $self->prepare();
+                $self->prepare;
                 $self->pass1_count;
                 $self->pass2_merge;
                 $self->finish();
