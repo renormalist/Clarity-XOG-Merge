@@ -7,28 +7,26 @@ class XOG::Merge {
         use XML::Twig;
         use Data::Dumper;
 
-        has files         => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
-        has projectids    => ( is => "rw", isa => "HashRef",  default => sub {{}} );
-        has cur_file      => ( is => "rw" );
-        has template_file => ( is => "rw", default => "TEMPLATE.xml" );
-        has out_twig      => ( is => "rw" );
-        has out_Projects  => ( is => "rw" );
-        has out_file      => ( is => "rw", default => "OUTFILE.xml" );
+        has files                => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
+        has projectids           => ( is => "rw", isa => "HashRef",  default => sub {{}} );
+        has cur_file             => ( is => "rw" );
+        has out_file             => ( is => "rw", default => "OUTFILE.xml" );
 
-        method HEADER {
-                q[
+        sub TEMPLATE_HEADER {
+                q#
+<!-- edited with Emacs 23 (http://emacswiki.org) by cris (na) -->
+<!--XOG XML from CA is prj_projects_alloc_act_etc_read.  Emptied by Sunday School Teacher to act as template. -->
 <NikuDataBus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nikuxog_project.xsd">
-	<Header action="write" externalSource="NIKU" objectType="project" version="7.5.0"/>
+	<Header action="write" externalSource="NIKU" objectType="project" version="7.5.0" WE_ARE_TEMPLATE="YES"/>
 	<Projects>
-];
+#
         }
 
-        method FOOTER {
-                q[
+        sub TEMPLATE_FOOTER {
+                q#
 	</Projects>
 </NikuDataBus>
-
-];
+#
         }
 
         sub cb_Collect_Project
@@ -53,18 +51,13 @@ class XOG::Merge {
                 # cleanup temp dirs
         }
 
-        # $twig->set_pretty_print( 'indented');     # \n before tags not part of mixed content
-        # $twig->print;
-
         method pass1_count
         {
                 foreach my $f ($self->files) {
                         $self->cur_file( $f );
                         my $twig= XML::Twig->new
-                            ( twig_handlers => {
-                                                'Projects/Project' => \&cb_Collect_Project,
-                                               }
-                            );
+                            ( twig_handlers =>
+                              { 'Projects/Project' => \&cb_Collect_Project } );
                         $twig->{_self} = $self;
                         $twig->parsefile( $f );
                 }
@@ -72,49 +65,27 @@ class XOG::Merge {
 
         method add_project_to_final ($el)
         {
-                $el->paste($self->out_Projects);
-                #$el->flush;
-        }
-
-        sub print_n_purge
-        {
-                my ($t, $elt) = @_;
-                #$elt->flush; # currently prints that strange closing NikuDataBus tag
-                #$t->purge;
+                #$el->set_pretty_print( 'indented');     # \n before tags not part of mixed content
+                $el->print(\*XOGMERGEOUT);
         }
 
         method prepare_output
         {
-                #open( OUT, ">", $self->out_file) or die "cannot open out file ".$self->out_file.": $!";
-                $self->out_twig(XML::Twig->new
-                                (
-                                 # twig_roots               => {
-                                 #                              NikuDataBus => \&print_n_purge,
-                                 #                              # Projects    => \&print_n_purge,
-                                 #                              # Project     => \&print_n_purge,
-                                 #                              # Header      => \&print_n_purge,
-                                 #                              # Ressource   => \&print_n_purge,
-                                 #                              # Ressource   => \&print_n_purge,
-                                 #                             },
-                                 # twig_print_outside_roots => \*OUT,
-                                ));
-                $self->out_twig->{_self} = $self;
-                $self->out_twig->parsefile( $self->template_file );
-                my $Projects = $self->out_twig->root->first_child('Projects');
-                #print STDERR Dumper($Projects);
-                $self->out_Projects( $Projects );
+                open XOGMERGEOUT, ">", $self->out_file
+                    or die "Cannot open out file ".$self->out_file.": $!";
+                print XOGMERGEOUT TEMPLATE_HEADER;
         }
 
         method finish_output
         {
-                #$self->out_Projects->flush; # prints to STDOUT for some reason
-                $self->out_twig->flush;
+                print XOGMERGEOUT TEMPLATE_FOOTER;
+                close XOGMERGEOUT;
         }
 
         method pass2_merge
         {
                 $self->prepare_output;
-                for (my $i=0; $i<10; $i++)
+                for (my $i=0; $i<1000_000; $i++)
                 {
                         # prepare project
                         my $el = XML::Twig::Elt->new("Project");
@@ -131,7 +102,7 @@ class XOG::Merge {
                 $self->pass1_count;
                 $self->pass2_merge;
                 $self->finish();
-                print "\n"; # XXX: needed as long as it spits out output and confuses TAP
+                #print "\n"; # XXX: needed as long as it spits out output and confuses TAP
                 # print Dumper($self->projectids);
         }
 
