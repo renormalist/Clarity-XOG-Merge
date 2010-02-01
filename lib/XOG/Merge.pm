@@ -6,10 +6,12 @@ class XOG::Merge {
 
         use XML::Twig;
         use Data::Dumper;
+        use File::Find::Object;
 
         has files                => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
         has projectids           => ( is => "rw", isa => "HashRef",  default => sub {{}} );
         has cur_file             => ( is => "rw" );
+        has cur_proj             => ( is => "rw" );
         has out_file             => ( is => "rw", default => "OUTFILE.xml" );
 
         sub TEMPLATE_HEADER {
@@ -103,7 +105,7 @@ class XOG::Merge {
                 my $projectID = $project->att('projectID');
                 my $name      = $project->att('name');
 
-                if (keys %{$self->projectids->{$projectID}{files}} > 1)
+                if (1 or keys %{$self->projectids->{$projectID}{files}} > 1)
                 {
                         # do this always (without surrounding if/else
                         # if single-org-projects rarely occur
@@ -112,6 +114,48 @@ class XOG::Merge {
                 else
                 {
                         $self->add_project_to_final($project);
+                }
+        }
+
+        sub cb_Open_Project
+        {
+                my ($t, $project) = @_;
+                my $self = $t->{_self};
+
+                unless ($self->cur_proj) {
+                        my $resources = XML::Twig::Elt->new('Resources');
+                        $resources->paste( $resources );
+                        $self->cur_proj( $project );
+                }
+        }
+
+        sub cb_Save_Resource
+        {
+                my ($t, $resource) = @_;
+                my $self = $t->{_self};
+
+                my $resources = $self->cur_proj->first_child('Resources');
+                $resource->paste($resources);
+                $resource->print(\*XOGMERGEOUT);
+        }
+
+        method add_buckets_to_final
+        {
+                print `ls -1 bucket*`;
+                my $buckets = File::Find::Object->new ({filter => sub { /^bucket-.*\.tmp$/ }});
+                while (my $bucket = $buckets->next)
+                {
+                        print $bucket ."\n";
+                        $self->cur_file( $bucket );
+                        $self->cur_proj( undef );
+                        my $twig= XML::Twig->new (
+                                                  start_tag_handlers => { "Projects/Project"     => \&cb_Open_Project },
+                                                  twig_handlers      => { "Resources/Resource" => \&cb_Save_Resource }
+                                                 );
+                        $twig->{_self} = $self;
+                        $twig->parsefile( $bucket );
+                        $self->add_project_to_final($self->cur_proj);
+                        # WEITER
                 }
         }
 
@@ -128,6 +172,7 @@ class XOG::Merge {
                         $twig->{_self} = $self;
                         $twig->parsefile( $f );
                 }
+                $self->add_buckets_to_final;
                 # ------------------------------------------------------------
                 $self->finish_output;
                 # ------------------------------------------------------------
