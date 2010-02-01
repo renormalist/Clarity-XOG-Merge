@@ -63,17 +63,30 @@ class XOG::Merge {
                 }
         }
 
-        method add_project_to_final ($el)
+        method add_project_to_final ($project)
         {
-                #$el->set_pretty_print( 'indented');     # \n before tags not part of mixed content
-                $el->print(\*XOGMERGEOUT);
+                #$project->set_pretty_print( 'indented');     # \n before tags not part of mixed content
+                $project->print(\*XOGMERGEOUT);
+        }
+
+        method add_project_to_bucket ($project)
+        {
+                my $projectID  = $project->att('projectID');
+                my $bucketfile = "bucket-$projectID.tmp";
+
+                open XOGMERGEBUCKET, ">>", $bucketfile or die "Cannot open bucket file ".$bucketfile.": $!";
+                $project->print(\*XOGMERGEBUCKET);
+                close XOGMERGEBUCKET;
         }
 
         method prepare_output
         {
-                open XOGMERGEOUT, ">", $self->out_file
-                    or die "Cannot open out file ".$self->out_file.": $!";
+                open XOGMERGEOUT, ">", $self->out_file or die "Cannot open out file ".$self->out_file.": $!";
                 print XOGMERGEOUT TEMPLATE_HEADER;
+        }
+
+        method clean_old_buckets {
+                system ("rm -f bucket-*.tmp");
         }
 
         method finish_output
@@ -82,18 +95,42 @@ class XOG::Merge {
                 close XOGMERGEOUT;
         }
 
+        sub cb_Save_Project
+        {
+                my ($t, $project) = @_;
+                my $self = $t->{_self};
+
+                my $projectID = $project->att('projectID');
+                my $name      = $project->att('name');
+
+                if (keys %{$self->projectids->{$projectID}{files}} > 1)
+                {
+                        # do this always (without surrounding if/else
+                        # if single-org-projects rarely occur
+                        $self->add_project_to_bucket($project);
+                }
+                else
+                {
+                        $self->add_project_to_final($project);
+                }
+        }
+
         method pass2_merge
         {
+                # ------------------------------------------------------------
                 $self->prepare_output;
-                for (my $i=0; $i<1000_000; $i++)
+                $self->clean_old_buckets;
+                # ------------------------------------------------------------
+                foreach my $f ($self->files)
                 {
-                        # prepare project
-                        my $el = XML::Twig::Elt->new("Project");
-                        $el->set_att("projectID", "PRJ-".(100_000+$i));
-                        $el->set_att("name", "project$i");
-                        $self->add_project_to_final($el);
+                        $self->cur_file( $f );
+                        my $twig= XML::Twig->new (twig_handlers => { 'Projects/Project' => \&cb_Save_Project });
+                        $twig->{_self} = $self;
+                        $twig->parsefile( $f );
                 }
+                # ------------------------------------------------------------
                 $self->finish_output;
+                # ------------------------------------------------------------
         }
 
         method Main
