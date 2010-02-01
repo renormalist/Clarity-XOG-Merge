@@ -8,6 +8,7 @@ license  'perl';
 build_requires 'Test::More';
 requires 'XML::Twig';
 requires 'MooseX::Declare';
+requires 'Perl6::Slurp';
 
 auto_install;
 
