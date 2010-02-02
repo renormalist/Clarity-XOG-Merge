@@ -13,6 +13,7 @@ class XOG::Merge {
         has cur_file             => ( is => "rw" );
         has cur_proj             => ( is => "rw" );
         has out_file             => ( is => "rw", default => "OUTFILE.xml" );
+        has ALWAYSBUCKETS        => ( is => "rw", default => 1 );
 
         sub TEMPLATE_HEADER {
                 q#
@@ -107,7 +108,9 @@ class XOG::Merge {
                 my $projectID = $project->att('projectID');
                 my $name      = $project->att('name');
 
-                if (1 or keys %{$self->projectids->{$projectID}{files}} > 1)
+                #say STDERR "cb_Save_Project: $projectID ($name)";
+
+                if ($self->ALWAYSBUCKETS or keys %{$self->projectids->{$projectID}{files}} > 1)
                 {
                         # do this always (without surrounding if/else
                         # if single-org-projects rarely occur
