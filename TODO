@@ -69,5 +69,12 @@
 ********* add_project_to_final($project);
 *** class:
 * TODO Project/CustomInformation?
+*** what if a project is spanned over several organisations?
+***** <Resource> elements are appended into one <Resources>
+***** what to do with all other elements besides the several <Resource> elements
+*** alternatives:
+***** ignore completely, throw away
+***** take all, by adding them all to surrounding (single) <Project>
+***** take whole <Project> element from first (unsorted, any) <Project>
 *** multiple?
-*** 
+*** take first?
