@@ -176,8 +176,8 @@ class XOG::Merge {
                         $self->fix_cur_file;
                         $self->cur_proj( undef );
                         my $twig= XML::Twig->new (
-                                                  start_tag_handlers => { "Projects/Project"     => \&cb_Open_Project },
-                                                  twig_handlers      => { "Resources/Resource" => \&cb_Save_Resource }
+                                                  start_tag_handlers => { "Project"  => \&cb_Open_Project },
+                                                  twig_handlers      => { "Resource" => \&cb_Save_Resource },
                                                  );
                         $twig->{_self} = $self;
                         $twig->parsefile( $bucket );
