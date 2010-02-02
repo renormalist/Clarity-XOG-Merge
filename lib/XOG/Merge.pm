@@ -73,6 +73,7 @@ class XOG::Merge {
 
                 # say STDERR "add_project_to_final: $projectID ($name)";
                 $project->set_pretty_print( 'indented');     # \n before tags not part of mixed content
+                say XOGMERGEOUT "\n*** XOGMERGEOUT-add_project_to_final: $projectID";
                 $project->print(\*XOGMERGEOUT);
         }
 
@@ -83,6 +84,7 @@ class XOG::Merge {
 
                 $self->buckets->{$bucketfile} = 1;
                 open XOGMERGEBUCKET, ">>", $bucketfile or die "Cannot open bucket file ".$bucketfile.": $!";
+                say XOGMERGEBUCKET "\n*** XOGMERGEBUCKET-add_project_to_bucket: $projectID";
                 $project->print(\*XOGMERGEBUCKET);
                 close XOGMERGEBUCKET;
         }
@@ -90,6 +92,7 @@ class XOG::Merge {
         method prepare_output
         {
                 open XOGMERGEOUT, ">", $self->out_file or die "Cannot open out file ".$self->out_file.": $!";
+                say XOGMERGEOUT "\n*** XOGMERGEOUT-prepare_output";
                 print XOGMERGEOUT TEMPLATE_HEADER;
         }
 
@@ -100,6 +103,7 @@ class XOG::Merge {
 
         method finish_output
         {
+                say XOGMERGEOUT "\n*** XOGMERGEOUT-finish_output";
                 print XOGMERGEOUT TEMPLATE_FOOTER;
                 close XOGMERGEOUT;
         }
