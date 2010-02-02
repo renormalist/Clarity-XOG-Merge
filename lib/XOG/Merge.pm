@@ -152,8 +152,18 @@ class XOG::Merge {
                 # say STDERR "cb_Save_Resource: $resourceID";
 
                 my $resources = $self->cur_proj->first_child('Resources');
-                $resource->paste($resources);
-                $resource->print(\*XOGMERGEOUT);
+                my $res = $resource->copy;
+                $res->paste($resources);
+                $res->print(\*XOGMERGEOUT);
+        }
+
+        method fix_cur_file
+        {
+                my $f = $self->cur_file;
+                system "echo '<Projects>' > xyz";
+                system "cat $f >> xyz";
+                system "echo '</Projects>' >> xyz";
+                system "cat xyz > $f";
         }
 
         method add_buckets_to_final
@@ -163,6 +173,7 @@ class XOG::Merge {
                 {
                         # say STDERR "bucket: $bucket";
                         $self->cur_file( $bucket );
+                        $self->fix_cur_file;
                         $self->cur_proj( undef );
                         my $twig= XML::Twig->new (
                                                   start_tag_handlers => { "Projects/Project"     => \&cb_Open_Project },
