@@ -11,7 +11,6 @@ build_requires 'Test::More';
 
 requires 'XML::Twig';
 requires 'MooseX::Declare';
-requires 'File::Find::Object';
 
 auto_install;
 

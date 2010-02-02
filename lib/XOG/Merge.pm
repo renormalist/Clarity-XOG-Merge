@@ -6,10 +6,10 @@ class XOG::Merge {
 
         use XML::Twig;
         use Data::Dumper;
-        use File::Find::Object;
 
         has files                => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
         has projectids           => ( is => "rw", isa => "HashRef",  default => sub {{}} );
+        has buckets              => ( is => "rw" );
         has cur_file             => ( is => "rw" );
         has cur_proj             => ( is => "rw" );
         has out_file             => ( is => "rw", default => "OUTFILE.xml" );
@@ -76,6 +76,7 @@ class XOG::Merge {
                 my $projectID  = $project->att('projectID');
                 my $bucketfile = "bucket-$projectID.tmp";
 
+                $self->buckets->{$bucketfile} = 1;
                 open XOGMERGEBUCKET, ">>", $bucketfile or die "Cannot open bucket file ".$bucketfile.": $!";
                 $project->print(\*XOGMERGEBUCKET);
                 close XOGMERGEBUCKET;
@@ -89,6 +90,7 @@ class XOG::Merge {
 
         method clean_old_buckets {
                 system ("rm -f bucket-*.tmp");
+                $self->buckets({});
         }
 
         method finish_output
@@ -141,9 +143,8 @@ class XOG::Merge {
 
         method add_buckets_to_final
         {
-                print `ls -1 bucket*`;
-                my $buckets = File::Find::Object->new ({filter => sub { /^bucket-.*\.tmp$/ }});
-                while (my $bucket = $buckets->next)
+                # say STDERR "Find buckets...";
+                foreach my $bucket (keys %{$self->buckets})
                 {
                         print $bucket ."\n";
                         $self->cur_file( $bucket );
