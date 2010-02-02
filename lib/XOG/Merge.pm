@@ -154,7 +154,8 @@ class XOG::Merge {
                 my $resources = $self->cur_proj->first_child('Resources');
                 my $res = $resource->copy;
                 $res->paste($resources);
-                $res->print(\*XOGMERGEOUT);
+                #say XOGMERGEOUT "\n*** XOGMERGEOUT-cb_Save_Resource: $resourceID";
+                #$res->print(\*XOGMERGEOUT);
         }
 
         method fix_cur_file
