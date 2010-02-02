@@ -68,7 +68,11 @@ class XOG::Merge {
 
         method add_project_to_final ($project)
         {
-                #$project->set_pretty_print( 'indented');     # \n before tags not part of mixed content
+                my $projectID = $project->att('projectID');
+                my $name      = $project->att('name');
+
+                # say STDERR "add_project_to_final: $projectID ($name)";
+                $project->set_pretty_print( 'indented');     # \n before tags not part of mixed content
                 $project->print(\*XOGMERGEOUT);
         }
 
@@ -127,6 +131,11 @@ class XOG::Merge {
                 my ($t, $project) = @_;
                 my $self = $t->{_self};
 
+                # debug
+                my $projectID = $project->att('projectID');
+                my $name      = $project->att('name');
+                # say STDERR "cb_Save_Project: $projectID ($name)";
+
                 unless ($self->cur_proj) {
                         my $resources = XML::Twig::Elt->new('Resources');
                         $resources->paste( $resources );
@@ -139,6 +148,9 @@ class XOG::Merge {
                 my ($t, $resource) = @_;
                 my $self = $t->{_self};
 
+                my $resourceID = $resource->att('resourceID');
+                # say STDERR "cb_Save_Resource: $resourceID";
+
                 my $resources = $self->cur_proj->first_child('Resources');
                 $resource->paste($resources);
                 $resource->print(\*XOGMERGEOUT);
@@ -149,7 +161,7 @@ class XOG::Merge {
                 # say STDERR "Find buckets...";
                 foreach my $bucket (keys %{$self->buckets})
                 {
-                        print $bucket ."\n";
+                        # say STDERR "bucket: $bucket";
                         $self->cur_file( $bucket );
                         $self->cur_proj( undef );
                         my $twig= XML::Twig->new (
@@ -165,10 +177,8 @@ class XOG::Merge {
 
         method pass2_merge
         {
-                # ------------------------------------------------------------
                 $self->prepare_output;
                 $self->clean_old_buckets;
-                # ------------------------------------------------------------
                 foreach my $f ($self->files)
                 {
                         $self->cur_file( $f );
@@ -177,9 +187,7 @@ class XOG::Merge {
                         $twig->parsefile( $f );
                 }
                 $self->add_buckets_to_final;
-                # ------------------------------------------------------------
                 $self->finish_output;
-                # ------------------------------------------------------------
         }
 
         method Main
