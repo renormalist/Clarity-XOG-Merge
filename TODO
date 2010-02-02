@@ -68,6 +68,8 @@
 ************* $project.add($resource)
 ********* add_project_to_final($project);
 *** class:
+* TODO Bugs
+*** TODO Resource elements twice inside Project
 * TODO Project/CustomInformation?
 *** what if a project is spanned over several organisations?
 ***** <Resource> elements are appended into one <Resources>
