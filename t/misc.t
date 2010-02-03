@@ -5,12 +5,76 @@ use warnings;
 
 use XOG::Merge;
 use Test::More;
+use Test::Deep;
 
-ok(1, "before");
+my $out_file = 'OUTFILE.xml';
 
-my $merger = XOG::Merge->new (files => ['t/QA.xml', 't/PS.xml', 't/TJ.xml']);
+# ----- merge -----
+my $merger = XOG::Merge->new (
+                              files => ['t/QA.xml', 't/PS.xml', 't/TJ.xml'],
+                              #out_file => $out_file
+                             );
 $merger->Main;
 
-ok(1, "after");
+# ----- evaluate result -----
+my $counter_Resource          = 0;
+my $counter_Project           = 0;
+my $counter_CustomInformation = 0;
+
+my @projects = ();
+
+sub cb_Resource {
+        $counter_Resource++;
+}
+
+sub cb_Project {
+        my ($t, $project) = @_;
+
+        my $projectID = $project->att('projectID');
+        my $name      = $project->att('name');
+
+        $counter_Project++;
+        push @projects, { projectID => $projectID,
+                          name      => $name };
+}
+
+sub cb_CustomInformation {
+        $counter_CustomInformation++;
+}
+
+my $twig= XML::Twig->new ( twig_handlers => {
+                                             Project           => \&cb_Project,
+                                             Resource          => \&cb_Resource,
+                                             CustomInformation => \&cb_CustomInformation,
+                                            },
+                         );
+$twig->parsefile( $out_file );
+{
+        local $TODO = "bug: elements from read xml duplicate in created xml";
+        is($counter_Resource, 14, "count result Resource elements");
+}
+
+my @expected_projects = (
+                         { projectID => "PRJ-300330",
+                           name      => "KRAM Testing"
+                         },
+                         { projectID => "PRJ-200220",
+                           name      => "Turbo Basic"
+                         },
+                         { projectID => "PRJ-100224",
+                           name      => "Eidolon"
+                         },
+                         { projectID => "PRJ-100222",
+                           name      => "International Karate"
+                         },
+                         { projectID => "PRJ-100223",
+                           name      => "Birne"
+                         },
+                        );
+
+is($counter_Project, 5, "count result Project elements");
+cmp_bag(\@projects, \@expected_projects, "expected project elements");
+
+is($counter_CustomInformation, $counter_Project, "have as many CustomInformation as Project elements");
 
 done_testing();
