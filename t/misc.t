@@ -49,10 +49,7 @@ my $twig= XML::Twig->new ( twig_handlers => {
                                             },
                          );
 $twig->parsefile( $out_file );
-{
-        local $TODO = "bug: elements from read xml duplicate in created xml";
-        is($counter_Resource, 14, "count result Resource elements");
-}
+is($counter_Resource, 14, "count result Resource elements");
 
 my @expected_projects = (
                          { projectID => "PRJ-300330",
