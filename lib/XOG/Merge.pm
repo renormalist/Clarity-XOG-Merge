@@ -13,7 +13,7 @@ class XOG::Merge {
         has cur_file             => ( is => "rw" );
         has cur_proj             => ( is => "rw" );
         has out_file             => ( is => "rw", default => "OUTFILE.xml" );
-        has ALWAYSBUCKETS        => ( is => "rw", default => 1 );
+        has ALWAYSBUCKETS        => ( is => "rw", default => 0 );
 
         sub TEMPLATE_HEADER {
                 q#
