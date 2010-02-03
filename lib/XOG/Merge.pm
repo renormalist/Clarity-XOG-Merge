@@ -141,8 +141,9 @@ class XOG::Merge {
                 say XOGMERGEOUT "\n<!-- *** XOGMERGEOUT-cb_Open_Project: $projectID ($name) -->";
 
                 unless ($self->cur_proj) {
-                        my $resources = XML::Twig::Elt->new('Resources');
-                        $resources->paste( $resources );
+                        #my $resources = XML::Twig::Elt->new('Resources');
+                        #say XOGMERGEOUT "\n<!-- *** XOGMERGEOUT-cb_Open_Project::resources->new->paste(project) -->";
+                        #$resources->paste( $project );
                         $self->cur_proj( $project );
                 }
         }
