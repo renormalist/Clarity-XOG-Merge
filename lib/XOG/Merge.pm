@@ -191,10 +191,8 @@ class XOG::Merge {
                 }
         }
 
-        method pass2_merge
+        method collect_projects_to_buckets_or_final
         {
-                $self->prepare_output;
-                $self->clean_old_buckets;
                 foreach my $f ($self->files)
                 {
                         $self->cur_file( $f );
@@ -202,6 +200,13 @@ class XOG::Merge {
                         $twig->{_self} = $self;
                         $twig->parsefile( $f );
                 }
+        }
+
+        method pass2_merge
+        {
+                $self->prepare_output;
+                $self->clean_old_buckets;
+                $self->collect_projects_to_buckets_or_final;
                 $self->add_buckets_to_final;
                 $self->finish_output;
         }
