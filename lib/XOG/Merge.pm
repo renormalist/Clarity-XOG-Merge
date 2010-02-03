@@ -147,18 +147,29 @@ class XOG::Merge {
         {
                 my ($t, $resource) = @_;
                 my $self = $t->{_self};
+
                 state $res_counter = 0;
 
                 my $resourceID = $resource->att('resourceID');
-                # say STDERR "cb_Save_Resource: $resourceID";
 
                 my $resources = $self->cur_proj->first_child('Resources');
-                my $res = $resource->copy;
-                $resource->set_att('_____ORIGINAL_RES_COUNTER_____', $res_counter++);
+                # without cut (eg. by using "copy") the original resource would be duplicate in result XML
+                my $res = $resource->cut; 
+                $resource->set_att('_____ORIGINAL_RES_COUNTER_____', $res_counter++); # <--- PROBLEM HERE!
                 $res->set_att('_____RES_COUNTER_____', $res_counter++);
-                $res->paste(last_child => $resources); # ok, or?
+                $res->set_att('resourceID', $resourceID."-paste");
+
+                # MEDITATION:
+                #
+                # This paste does the right thing.
+                # The question is, why is the original $resource argument also printed?
+                # You can find out by uncommenting the following "$res->paste" line.
+                #
+                # Is it just the whole bucket XML that gets added to project?
+                #
+
+                $res->paste(last_child => $resources); # ok
                 say XOGMERGEOUT "\n<!-- *** XOGMERGEOUT-cb_Save_Resource: $resourceID -->";
-                # $res->print(\*XOGMERGEOUT); # WRONG, this immediately writes single resource out
         }
 
         method fix_cur_file
