@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-
 use strict;
 use warnings;
 
@@ -7,12 +5,12 @@ use XOG::Merge;
 use Test::More;
 use Test::Deep;
 
-my $out_file = 'OUTFILE.xml';
+my $out_file = 't/tmp_OUTFILE.xml';
 
 # ----- merge -----
 my $merger = XOG::Merge->new (
                               files => ['t/QA.xml', 't/PS.xml', 't/TJ.xml'],
-                              #out_file => $out_file
+                              out_file => $out_file
                              );
 $merger->Main;
 
