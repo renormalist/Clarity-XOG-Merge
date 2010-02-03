@@ -152,6 +152,7 @@ class XOG::Merge {
         {
                 my ($t, $resource) = @_;
                 my $self = $t->{_self};
+                state $res_counter = 0;
 
                 my $resourceID = $resource->att('resourceID');
                 # say STDERR "cb_Save_Resource: $resourceID";
