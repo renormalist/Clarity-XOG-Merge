@@ -73,7 +73,7 @@ class XOG::Merge {
 
                 # say STDERR "add_project_to_final: $projectID ($name)";
                 $project->set_pretty_print( 'indented');     # \n before tags not part of mixed content
-                say XOGMERGEOUT "\n*** XOGMERGEOUT-add_project_to_final: $projectID";
+                say XOGMERGEOUT "\n<!-- *** XOGMERGEOUT-add_project_to_final: $projectID -->";
                 $project->print(\*XOGMERGEOUT);
         }
 
@@ -84,7 +84,7 @@ class XOG::Merge {
 
                 $self->buckets->{$bucketfile} = 1;
                 open XOGMERGEBUCKET, ">>", $bucketfile or die "Cannot open bucket file ".$bucketfile.": $!";
-                say XOGMERGEBUCKET "\n*** XOGMERGEBUCKET-add_project_to_bucket: $projectID";
+                say XOGMERGEBUCKET "\n<!-- *** XOGMERGEBUCKET-add_project_to_bucket: $projectID -->";
                 $project->print(\*XOGMERGEBUCKET);
                 close XOGMERGEBUCKET;
         }
@@ -92,7 +92,7 @@ class XOG::Merge {
         method prepare_output
         {
                 open XOGMERGEOUT, ">", $self->out_file or die "Cannot open out file ".$self->out_file.": $!";
-                say XOGMERGEOUT "\n*** XOGMERGEOUT-prepare_output";
+                say XOGMERGEOUT "\n<!-- *** XOGMERGEOUT-prepare_output -->";
                 print XOGMERGEOUT TEMPLATE_HEADER;
         }
 
@@ -103,7 +103,7 @@ class XOG::Merge {
 
         method finish_output
         {
-                say XOGMERGEOUT "\n*** XOGMERGEOUT-finish_output";
+                say XOGMERGEOUT "\n<!-- *** XOGMERGEOUT-finish_output -->";
                 print XOGMERGEOUT TEMPLATE_FOOTER;
                 close XOGMERGEOUT;
         }
@@ -138,7 +138,7 @@ class XOG::Merge {
                 # debug
                 my $projectID = $project->att('projectID');
                 my $name      = $project->att('name');
-                # say STDERR "cb_Save_Project: $projectID ($name)";
+                say XOGMERGEOUT "\n<!-- *** XOGMERGEOUT-cb_Open_Project: $projectID ($name) -->";
 
                 unless ($self->cur_proj) {
                         my $resources = XML::Twig::Elt->new('Resources');
@@ -157,9 +157,11 @@ class XOG::Merge {
 
                 my $resources = $self->cur_proj->first_child('Resources');
                 my $res = $resource->copy;
-                $res->paste($resources);
-                #say XOGMERGEOUT "\n*** XOGMERGEOUT-cb_Save_Resource: $resourceID";
-                #$res->print(\*XOGMERGEOUT);
+                $resource->set_att('_____ORIGINAL_RES_COUNTER_____', $res_counter++);
+                $res->set_att('_____RES_COUNTER_____', $res_counter++);
+                $res->paste(last_child => $resources); # ok, or?
+                say XOGMERGEOUT "\n<!-- *** XOGMERGEOUT-cb_Save_Resource: $resourceID -->";
+                # $res->print(\*XOGMERGEOUT); # WRONG, this immediately writes single resource out
         }
 
         method fix_cur_file
@@ -174,8 +176,10 @@ class XOG::Merge {
         method add_buckets_to_final
         {
                 # say STDERR "Find buckets...";
+                say XOGMERGEOUT "\n<!-- *** XOGMERGEOUT-add_buckets_to_final. -->";
                 foreach my $bucket (keys %{$self->buckets})
                 {
+                        say XOGMERGEOUT "\n<!-- *** XOGMERGEOUT-add_buckets_to_final: $bucket -->";
                         # say STDERR "bucket: $bucket";
                         $self->cur_file( $bucket );
                         $self->fix_cur_file;
@@ -186,8 +190,7 @@ class XOG::Merge {
                                                  );
                         $twig->{_self} = $self;
                         $twig->parsefile( $bucket );
-                        $self->add_project_to_final($self->cur_proj);
-                        # WEITER
+                        $self->add_project_to_final($self->cur_proj); # wrong duplicate
                 }
         }
 
