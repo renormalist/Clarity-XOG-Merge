@@ -218,15 +218,17 @@ __END__
 
 =head1 NAME
 
-XOG::Merge - Merge several Clarity XML Open Gateway files
+XOG::Merge - Merge several Clarity XML Open Gateway (XOG) files
 
 =head1 SYNOPSIS
 
 Merge several Clarity XOG ("XML Open Gateway") files into one
 
     use XOG::Merge;
-    my $merger = XOG::Merge->new();
-    # ...
+    my $merger = XOG::Merge->new
+                 ( files    => ['t/QA.xml', 't/PS.xml', 't/TJ.xml'],
+                   out_file => $out_file );
+    $merger->Main;
 
 =head1 AUTHOR
 
@@ -234,11 +236,10 @@ Steffen Schwigon, C<< <ss5 at renormalist.net> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-xog-merge at
-rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=XOG-Merge>.  I will
-be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+Please report any bugs or feature requests to C<< <ss5 at
+renormalist.net> >> or via http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Clarity-XOG-Merge. I will be notified, and
+then you'll automatically be notified of progress on your bug as I
+make changes.
 
 =head1 SUPPORT
 
@@ -246,34 +247,12 @@ You can find documentation for this module with the perldoc command.
 
     perldoc XOG::Merge
 
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XOG-Merge>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/XOG-Merge>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/XOG-Merge>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/XOG-Merge/>
-
-=back
-
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2010 Sunday School Teacher, all rights reserved.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
