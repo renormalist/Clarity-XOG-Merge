@@ -6,6 +6,7 @@ class XOG::Merge {
 
         use XML::Twig;
         use Data::Dumper;
+        use App::Cmd::Setup -app;
 
         has files                => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
         has projectids           => ( is => "rw", isa => "HashRef",  default => sub {{}} );
