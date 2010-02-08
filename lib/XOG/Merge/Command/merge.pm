@@ -1,11 +1,11 @@
 package XOG::Merge::Command::merge;
 
+use XOG::Merge -command;
+use Data::Dumper;
+
 use 5.010;
 use strict;
 use warnings;
-
-use XOG::Merge -command;
-use Data::Dumper;
 
 sub opt_spec {
         return (
@@ -18,6 +18,10 @@ sub validate_args {
 
         # no args allowed but options!
         $self->usage_error("No args allowed") if @$args;
+}
+
+sub execute {
+        say STDERR "Affe!";
 }
 
 sub run {

@@ -1,12 +1,18 @@
 use MooseX::Declare;
 
-use 5.010;
+#use 5.010;
 
 class XOG::Merge {
+#package XOG::Merge;
+
+        use App::Cmd::Setup -app;
+
+        use 5.010;
+        use strict;
+        use warnings;
 
         use XML::Twig;
         use Data::Dumper;
-        use App::Cmd::Setup -app;
 
         has files                => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
         has projectids           => ( is => "rw", isa => "HashRef",  default => sub {{}} );
@@ -15,6 +21,8 @@ class XOG::Merge {
         has cur_proj             => ( is => "rw" );
         has out_file             => ( is => "rw", default => "OUTFILE.xml" );
         has ALWAYSBUCKETS        => ( is => "rw", default => 0 );
+
+        sub usage_desc { "xog <subcommand> [options]" }
 
         sub TEMPLATE_HEADER {
                 q#
@@ -203,7 +211,6 @@ class XOG::Merge {
                 $self->pass2_merge;
                 $self->finish();
         }
-
 }
 
 # help the CPAN indexer
