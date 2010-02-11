@@ -1,9 +1,6 @@
 use MooseX::Declare;
 
-#use 5.010;
-
 class XOG::Merge {
-#package XOG::Merge;
 
         use App::Cmd::Setup -app;
 
@@ -77,8 +74,8 @@ class XOG::Merge {
 
         method add_project_to_final ($project)
         {
-                my $projectID = $project->att('projectID');
-                my $name      = $project->att('name');
+                # my $projectID = $project->att('projectID');
+                # my $name      = $project->att('name');
 
                 $project->set_pretty_print( 'indented');     # \n before tags not part of mixed content
                 $project->print(\*XOGMERGEOUT);
