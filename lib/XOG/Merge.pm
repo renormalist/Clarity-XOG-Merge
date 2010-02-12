@@ -1,13 +1,12 @@
-use MooseX::Declare;
+package XOG::Merge;
 
-class XOG::Merge {
-
-        use App::Cmd::Setup -app;
+our $VERSION = '0.01';
 
         use 5.010;
         use strict;
         use warnings;
 
+        use Moose;
         use XML::Twig;
         use Data::Dumper;
 
@@ -17,7 +16,7 @@ class XOG::Merge {
         has cur_file             => ( is => "rw" );
         has cur_proj             => ( is => "rw" );
         has out_file             => ( is => "rw", default => "OUTFILE.xml" );
-        has ALWAYSBUCKETS        => ( is => "rw", default => 0 );
+        has ALWAYSBUCKETS        => ( is => "rw", default => 1 );
 
         sub usage_desc { "xog <subcommand> [options]" }
 
@@ -49,19 +48,22 @@ class XOG::Merge {
                 $self->projectids->{$projectID}{files}{$self->cur_file}++;
         }
 
-        method prepare {
+        sub prepare {
+                my ($self) = @_;
                 # prepare temp dirs
                 # open FINAL
         }
 
-        method finish
+        sub finish
         {
+                my ($self) = @_;
                 # close FINAL;
                 # cleanup temp dirs
         }
 
-        method pass1_count
+        sub pass1_count
         {
+                my ($self) = @_;
                 foreach my $f ($self->files) {
                         $self->cur_file( $f );
                         my $twig= XML::Twig->new
@@ -72,8 +74,9 @@ class XOG::Merge {
                 }
         }
 
-        method add_project_to_final ($project)
+        sub add_project_to_final
         {
+                my ($self, $project) = @_;
                 # my $projectID = $project->att('projectID');
                 # my $name      = $project->att('name');
 
@@ -81,8 +84,9 @@ class XOG::Merge {
                 $project->print(\*XOGMERGEOUT);
         }
 
-        method add_project_to_bucket ($project)
+        sub add_project_to_bucket
         {
+                my ($self, $project) = @_;
                 my $projectID  = $project->att('projectID');
                 my $bucketfile = "bucket-$projectID.tmp";
 
@@ -92,19 +96,22 @@ class XOG::Merge {
                 close XOGMERGEBUCKET;
         }
 
-        method prepare_output
+        sub prepare_output
         {
+                my ($self) = @_;
                 open XOGMERGEOUT, ">", $self->out_file or die "Cannot open out file ".$self->out_file.": $!";
                 print XOGMERGEOUT TEMPLATE_HEADER;
         }
 
-        method clean_old_buckets {
+        sub clean_old_buckets {
+                my ($self) = @_;
                 system ("rm -f bucket-*.tmp");
                 $self->buckets({});
         }
 
-        method finish_output
+        sub finish_output
         {
+                my ($self) = @_;
                 print XOGMERGEOUT TEMPLATE_FOOTER;
                 close XOGMERGEOUT;
         }
@@ -155,8 +162,9 @@ class XOG::Merge {
                 $res->paste(last_child => $resources); # ok
         }
 
-        method fix_cur_file
+        sub fix_cur_file
         {
+                my ($self) = @_;
                 my $f = $self->cur_file;
                 system "echo '<Projects>' > xyz";
                 system "cat $f >> xyz";
@@ -164,8 +172,9 @@ class XOG::Merge {
                 system "cat xyz > $f";
         }
 
-        method add_buckets_to_final
+        sub add_buckets_to_final
         {
+                my ($self) = @_;
                 foreach my $bucket (keys %{$self->buckets})
                 {
                         $self->cur_file( $bucket );
@@ -181,8 +190,9 @@ class XOG::Merge {
                 }
         }
 
-        method collect_projects_to_buckets_or_final
+        sub collect_projects_to_buckets_or_final
         {
+                my ($self) = @_;
                 foreach my $f ($self->files)
                 {
                         $self->cur_file( $f );
@@ -192,8 +202,9 @@ class XOG::Merge {
                 }
         }
 
-        method pass2_merge
+        sub pass2_merge
         {
+                my ($self) = @_;
                 $self->prepare_output;
                 $self->clean_old_buckets;
                 $self->collect_projects_to_buckets_or_final;
@@ -201,18 +212,17 @@ class XOG::Merge {
                 $self->finish_output;
         }
 
-        method Main
+        sub Main
         {
+                my ($self) = @_;
                 $self->prepare;
                 $self->pass1_count;
                 $self->pass2_merge;
                 $self->finish();
         }
-}
 
 # help the CPAN indexer
 package XOG::Merge;
-our $VERSION = '0.01';
 
 1; # End of XOG::Merge
 
