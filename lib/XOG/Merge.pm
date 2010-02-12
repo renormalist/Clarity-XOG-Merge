@@ -2,224 +2,224 @@ package XOG::Merge;
 
 our $VERSION = '0.01';
 
-        use 5.010;
-        use strict;
-        use warnings;
+use 5.010;
+use strict;
+use warnings;
 
-        use Moose;
-        use XML::Twig;
-        use Data::Dumper;
+use Moose;
+use XML::Twig;
+use Data::Dumper;
 
-        has files                => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
-        has projectids           => ( is => "rw", isa => "HashRef",  default => sub {{}} );
-        has buckets              => ( is => "rw" );
-        has cur_file             => ( is => "rw" );
-        has cur_proj             => ( is => "rw" );
-        has out_file             => ( is => "rw", default => "OUTFILE.xml" );
-        has ALWAYSBUCKETS        => ( is => "rw", default => 1 );
+has files                => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
+has projectids           => ( is => "rw", isa => "HashRef",  default => sub {{}} );
+has buckets              => ( is => "rw" );
+has cur_file             => ( is => "rw" );
+has cur_proj             => ( is => "rw" );
+has out_file             => ( is => "rw", default => "OUTFILE.xml" );
+has ALWAYSBUCKETS        => ( is => "rw", default => 1 );
 
-        sub usage_desc { "xog <subcommand> [options]" }
+sub usage_desc { "xog <subcommand> [options]" }
 
-        sub TEMPLATE_HEADER {
-                q#
+sub TEMPLATE_HEADER {
+        q#
 <!-- edited with Emacs 23 (http://emacswiki.org) by cris (na) -->
 <!--XOG XML from CA is prj_projects_alloc_act_etc_read.  Emptied by Sunday School Teacher to act as template. -->
 <NikuDataBus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nikuxog_project.xsd">
 	<Header action="write" externalSource="NIKU" objectType="project" version="7.5.0" WE_ARE_TEMPLATE="YES"/>
 	<Projects>
 #
-        }
+}
 
-        sub TEMPLATE_FOOTER {
-                q#
+sub TEMPLATE_FOOTER {
+        q#
 	</Projects>
 </NikuDataBus>
 #
-        }
+}
 
-        sub cb_Collect_Project
+sub cb_Collect_Project
+{
+        my ($t, $project) = @_;
+        my $self = $t->{_self};
+
+        my $projectID = $project->att('projectID');
+        my $name      = $project->att('name');
+
+        $self->projectids->{$projectID}{files}{$self->cur_file}++;
+}
+
+sub prepare {
+        my ($self) = @_;
+        # prepare temp dirs
+        # open FINAL
+}
+
+sub finish
+{
+        my ($self) = @_;
+        # close FINAL;
+        # cleanup temp dirs
+}
+
+sub pass1_count
+{
+        my ($self) = @_;
+        foreach my $f ($self->files) {
+                $self->cur_file( $f );
+                my $twig= XML::Twig->new
+                    ( twig_handlers =>
+                      { 'Projects/Project' => \&cb_Collect_Project } );
+                $twig->{_self} = $self;
+                $twig->parsefile( $f );
+        }
+}
+
+sub add_project_to_final
+{
+        my ($self, $project) = @_;
+        # my $projectID = $project->att('projectID');
+        # my $name      = $project->att('name');
+
+        $project->set_pretty_print( 'indented');     # \n before tags not part of mixed content
+        $project->print(\*XOGMERGEOUT);
+}
+
+sub add_project_to_bucket
+{
+        my ($self, $project) = @_;
+        my $projectID  = $project->att('projectID');
+        my $bucketfile = "bucket-$projectID.tmp";
+
+        $self->buckets->{$bucketfile} = 1;
+        open XOGMERGEBUCKET, ">>", $bucketfile or die "Cannot open bucket file ".$bucketfile.": $!";
+        $project->print(\*XOGMERGEBUCKET);
+        close XOGMERGEBUCKET;
+}
+
+sub prepare_output
+{
+        my ($self) = @_;
+        open XOGMERGEOUT, ">", $self->out_file or die "Cannot open out file ".$self->out_file.": $!";
+        print XOGMERGEOUT TEMPLATE_HEADER;
+}
+
+sub clean_old_buckets {
+        my ($self) = @_;
+        system ("rm -f bucket-*.tmp");
+        $self->buckets({});
+}
+
+sub finish_output
+{
+        my ($self) = @_;
+        print XOGMERGEOUT TEMPLATE_FOOTER;
+        close XOGMERGEOUT;
+}
+
+sub cb_Save_Project
+{
+        my ($t, $project) = @_;
+        my $self = $t->{_self};
+
+        my $projectID = $project->att('projectID');
+        my $name      = $project->att('name');
+
+        if ($self->ALWAYSBUCKETS or keys %{$self->projectids->{$projectID}{files}} > 1)
         {
-                my ($t, $project) = @_;
-                my $self = $t->{_self};
-
-                my $projectID = $project->att('projectID');
-                my $name      = $project->att('name');
-
-                $self->projectids->{$projectID}{files}{$self->cur_file}++;
+                # do this always (without surrounding if/else
+                # if single-org-projects rarely occur
+                $self->add_project_to_bucket($project);
         }
-
-        sub prepare {
-                my ($self) = @_;
-                # prepare temp dirs
-                # open FINAL
-        }
-
-        sub finish
+        else
         {
-                my ($self) = @_;
-                # close FINAL;
-                # cleanup temp dirs
+                $self->add_project_to_final($project);
         }
+}
 
-        sub pass1_count
+sub cb_Open_Project
+{
+        my ($t, $project) = @_;
+        my $self = $t->{_self};
+
+        # debug
+        my $projectID = $project->att('projectID');
+        my $name      = $project->att('name');
+
+        $self->cur_proj( $project ) unless $self->cur_proj;
+}
+
+sub cb_Save_Resource
+{
+        my ($t, $resource) = @_;
+        my $self = $t->{_self};
+
+        state $res_counter = 0;
+
+        my $resourceID = $resource->att('resourceID');
+
+        my $resources = $self->cur_proj->first_child('Resources');
+        my $res = $resource->cut;
+        $res->paste(last_child => $resources); # ok
+}
+
+sub fix_cur_file
+{
+        my ($self) = @_;
+        my $f = $self->cur_file;
+        system "echo '<Projects>' > xyz";
+        system "cat $f >> xyz";
+        system "echo '</Projects>' >> xyz";
+        system "cat xyz > $f";
+}
+
+sub add_buckets_to_final
+{
+        my ($self) = @_;
+        foreach my $bucket (keys %{$self->buckets})
         {
-                my ($self) = @_;
-                foreach my $f ($self->files) {
-                        $self->cur_file( $f );
-                        my $twig= XML::Twig->new
-                            ( twig_handlers =>
-                              { 'Projects/Project' => \&cb_Collect_Project } );
-                        $twig->{_self} = $self;
-                        $twig->parsefile( $f );
-                }
+                $self->cur_file( $bucket );
+                $self->fix_cur_file;
+                $self->cur_proj( undef );
+                my $twig= XML::Twig->new (
+                                          start_tag_handlers => { "Project"  => \&cb_Open_Project },
+                                          twig_handlers      => { "Resource" => \&cb_Save_Resource },
+                                         );
+                $twig->{_self} = $self;
+                $twig->parsefile( $bucket );
+                $self->add_project_to_final($self->cur_proj); # wrong duplicate
         }
+}
 
-        sub add_project_to_final
+sub collect_projects_to_buckets_or_final
+{
+        my ($self) = @_;
+        foreach my $f ($self->files)
         {
-                my ($self, $project) = @_;
-                # my $projectID = $project->att('projectID');
-                # my $name      = $project->att('name');
-
-                $project->set_pretty_print( 'indented');     # \n before tags not part of mixed content
-                $project->print(\*XOGMERGEOUT);
+                $self->cur_file( $f );
+                my $twig= XML::Twig->new (twig_handlers => { 'Projects/Project' => \&cb_Save_Project });
+                $twig->{_self} = $self;
+                $twig->parsefile( $f );
         }
+}
 
-        sub add_project_to_bucket
-        {
-                my ($self, $project) = @_;
-                my $projectID  = $project->att('projectID');
-                my $bucketfile = "bucket-$projectID.tmp";
+sub pass2_merge
+{
+        my ($self) = @_;
+        $self->prepare_output;
+        $self->clean_old_buckets;
+        $self->collect_projects_to_buckets_or_final;
+        $self->add_buckets_to_final;
+        $self->finish_output;
+}
 
-                $self->buckets->{$bucketfile} = 1;
-                open XOGMERGEBUCKET, ">>", $bucketfile or die "Cannot open bucket file ".$bucketfile.": $!";
-                $project->print(\*XOGMERGEBUCKET);
-                close XOGMERGEBUCKET;
-        }
-
-        sub prepare_output
-        {
-                my ($self) = @_;
-                open XOGMERGEOUT, ">", $self->out_file or die "Cannot open out file ".$self->out_file.": $!";
-                print XOGMERGEOUT TEMPLATE_HEADER;
-        }
-
-        sub clean_old_buckets {
-                my ($self) = @_;
-                system ("rm -f bucket-*.tmp");
-                $self->buckets({});
-        }
-
-        sub finish_output
-        {
-                my ($self) = @_;
-                print XOGMERGEOUT TEMPLATE_FOOTER;
-                close XOGMERGEOUT;
-        }
-
-        sub cb_Save_Project
-        {
-                my ($t, $project) = @_;
-                my $self = $t->{_self};
-
-                my $projectID = $project->att('projectID');
-                my $name      = $project->att('name');
-
-                if ($self->ALWAYSBUCKETS or keys %{$self->projectids->{$projectID}{files}} > 1)
-                {
-                        # do this always (without surrounding if/else
-                        # if single-org-projects rarely occur
-                        $self->add_project_to_bucket($project);
-                }
-                else
-                {
-                        $self->add_project_to_final($project);
-                }
-        }
-
-        sub cb_Open_Project
-        {
-                my ($t, $project) = @_;
-                my $self = $t->{_self};
-
-                # debug
-                my $projectID = $project->att('projectID');
-                my $name      = $project->att('name');
-
-                $self->cur_proj( $project ) unless $self->cur_proj;
-        }
-
-        sub cb_Save_Resource
-        {
-                my ($t, $resource) = @_;
-                my $self = $t->{_self};
-
-                state $res_counter = 0;
-
-                my $resourceID = $resource->att('resourceID');
-
-                my $resources = $self->cur_proj->first_child('Resources');
-                my $res = $resource->cut;
-                $res->paste(last_child => $resources); # ok
-        }
-
-        sub fix_cur_file
-        {
-                my ($self) = @_;
-                my $f = $self->cur_file;
-                system "echo '<Projects>' > xyz";
-                system "cat $f >> xyz";
-                system "echo '</Projects>' >> xyz";
-                system "cat xyz > $f";
-        }
-
-        sub add_buckets_to_final
-        {
-                my ($self) = @_;
-                foreach my $bucket (keys %{$self->buckets})
-                {
-                        $self->cur_file( $bucket );
-                        $self->fix_cur_file;
-                        $self->cur_proj( undef );
-                        my $twig= XML::Twig->new (
-                                                  start_tag_handlers => { "Project"  => \&cb_Open_Project },
-                                                  twig_handlers      => { "Resource" => \&cb_Save_Resource },
-                                                 );
-                        $twig->{_self} = $self;
-                        $twig->parsefile( $bucket );
-                        $self->add_project_to_final($self->cur_proj); # wrong duplicate
-                }
-        }
-
-        sub collect_projects_to_buckets_or_final
-        {
-                my ($self) = @_;
-                foreach my $f ($self->files)
-                {
-                        $self->cur_file( $f );
-                        my $twig= XML::Twig->new (twig_handlers => { 'Projects/Project' => \&cb_Save_Project });
-                        $twig->{_self} = $self;
-                        $twig->parsefile( $f );
-                }
-        }
-
-        sub pass2_merge
-        {
-                my ($self) = @_;
-                $self->prepare_output;
-                $self->clean_old_buckets;
-                $self->collect_projects_to_buckets_or_final;
-                $self->add_buckets_to_final;
-                $self->finish_output;
-        }
-
-        sub Main
-        {
-                my ($self) = @_;
-                $self->prepare;
-                $self->pass1_count;
-                $self->pass2_merge;
-                $self->finish();
-        }
+sub Main
+{
+        my ($self) = @_;
+        $self->prepare;
+        $self->pass1_count;
+        $self->pass2_merge;
+        $self->finish();
+}
 
 # help the CPAN indexer
 package XOG::Merge;
