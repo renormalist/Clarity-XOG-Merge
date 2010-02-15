@@ -1,5 +1,4 @@
 #! /usr/bin/env perl
 
-use XOG::Merge;
-my $app = XOG::Merge->new;
-$app->run;
+use XOG;
+XOG->run;

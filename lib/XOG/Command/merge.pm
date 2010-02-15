@@ -1,17 +1,22 @@
-package XOG::Merge::Command::merge;
-
-use XOG::Merge -command;
-use Data::Dumper;
+package XOG::Command::merge;
 
 use 5.010;
 use strict;
 use warnings;
 
-sub opt_spec {
-        return (
-                [ "out|o",  "Write result to that file" ],
-               );
+use XOG -command;
+use XOG::Merge;
+
+use Data::Dumper;
+
+sub opt_spec
+{
+        (
+         [ "out|o",  "Write result to that file", { default => "XOGMERGE.out" } ],
+        );
 }
+
+sub abstract { "merge several files" }
 
 sub validate_args {
         my ($self, $opt, $args) = @_;
@@ -21,10 +26,6 @@ sub validate_args {
 }
 
 sub execute {
-        say STDERR "Affe!";
-}
-
-sub run {
         my ($self, $opt, $args) = @_;
 
         print STDERR "opt:  ", Dumper($opt);
