@@ -6,17 +6,17 @@ use 5.010;
 use strict;
 use warnings;
 
-use Moose;
-use XML::Twig;
 use Data::Dumper;
+use XML::Twig;
+use Moose;
 
-has files                => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
-has projectids           => ( is => "rw", isa => "HashRef",  default => sub {{}} );
-has buckets              => ( is => "rw" );
-has cur_file             => ( is => "rw" );
-has cur_proj             => ( is => "rw" );
-has out_file             => ( is => "rw", default => "OUTFILE.xml" );
-has ALWAYSBUCKETS        => ( is => "rw", default => 1 );
+has files         => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
+has projectids    => ( is => "rw", isa => "HashRef",  default => sub {{}} );
+has buckets       => ( is => "rw" );
+has cur_file      => ( is => "rw" );
+has cur_proj      => ( is => "rw" );
+has out_file      => ( is => "rw", default => "OUTFILE.xml" );
+has ALWAYSBUCKETS => ( is => "rw", default => 1 );
 
 sub usage_desc { "xog <subcommand> [options]" }
 
@@ -220,9 +220,6 @@ sub Main
         $self->pass2_merge;
         $self->finish();
 }
-
-# help the CPAN indexer
-package XOG::Merge;
 
 1; # End of XOG::Merge
 
