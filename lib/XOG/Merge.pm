@@ -19,6 +19,8 @@ has cur_proj      => ( is => "rw" );
 has tmpdir        => ( is => "rw", default => sub { tempdir( CLEANUP => 1 ) });
 has out_file      => ( is => "rw", default => "OUTFILE.xml" );
 has ALWAYSBUCKETS => ( is => "rw", default => 1 );
+has verbose       => ( is => "rw", default => 0 );
+has debug         => ( is => "rw", default => 0 );
 
 sub usage_desc { "xog <subcommand> [options]" }
 
@@ -66,7 +68,9 @@ sub finish
 sub pass1_count
 {
         my ($self) = @_;
+        say "Pass 1: count" if $self->verbose || $self->debug;
         foreach my $f ($self->files) {
+                say "Read file $f" if $self->verbose || $self->debug;
                 $self->cur_file( $f );
                 my $twig= XML::Twig->new
                     ( twig_handlers =>
@@ -196,6 +200,7 @@ sub collect_projects_to_buckets_or_final
         my ($self) = @_;
         foreach my $f ($self->files)
         {
+                say "Read file $f" if $self->verbose || $self->debug;
                 $self->cur_file( $f );
                 my $twig= XML::Twig->new (twig_handlers => { 'Projects/Project' => \&cb_Save_Project });
                 $twig->{_self} = $self;
