@@ -5,11 +5,16 @@ use XOG::Merge;
 use Test::More;
 use Test::Deep;
 
-my $out_file = 't/tmp_OUTFILE.xml';
+use File::ShareDir qw(module_dir);
+use File::Temp qw(tempfile tempdir);
 
 # ----- merge -----
+
+my $srcdir = module_dir('XOG::Merge')."/testfiles";
+my $tmpdir = tempdir( CLEANUP => 1 );
+my $out_file = "$tmpdir/tmp_OUTFILE.xml";
 my $merger = XOG::Merge->new (
-                              files => ['t/QA.xml', 't/PS.xml', 't/TJ.xml'],
+                              files => ["$srcdir/QA.xml", "$srcdir/PS.xml", "$srcdir/TJ.xml"],
                               out_file => $out_file
                              );
 $merger->Main;
