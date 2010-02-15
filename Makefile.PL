@@ -12,7 +12,7 @@ build_requires 'Test::More';
 requires 'XML::Twig';
 requires 'MooseX::Declare';
 
-install_script 'xog';
+install_script 'xogtool';
 
 auto_install;
 

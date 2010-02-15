@@ -12,7 +12,7 @@ use Data::Dumper;
 sub opt_spec
 {
         (
-         [ "out|o",  "Write result to that file", { default => "XOGMERGE.out" } ],
+         [ "out|o=s",  "Write result to that file", { default => "XOGMERGE.out" } ],
         );
 }
 
