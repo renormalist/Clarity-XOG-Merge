@@ -6,6 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
+use File::Temp qw(tempfile tempdir);
 use Data::Dumper;
 use XML::Twig;
 use Moose;
@@ -15,6 +16,7 @@ has projectids    => ( is => "rw", isa => "HashRef",  default => sub {{}} );
 has buckets       => ( is => "rw" );
 has cur_file      => ( is => "rw" );
 has cur_proj      => ( is => "rw" );
+has tmpdir        => ( is => "rw", default => sub { tempdir( CLEANUP => 1 ) });
 has out_file      => ( is => "rw", default => "OUTFILE.xml" );
 has ALWAYSBUCKETS => ( is => "rw", default => 1 );
 
@@ -88,10 +90,11 @@ sub add_project_to_bucket
 {
         my ($self, $project) = @_;
         my $projectID  = $project->att('projectID');
-        my $bucketfile = "bucket-$projectID.tmp";
+        my $bucketfile = $self->tmpdir."/bucket-$projectID.tmp";
 
-        $self->buckets->{$bucketfile} = 1;
         open XOGMERGEBUCKET, ">>", $bucketfile or die "Cannot open bucket file ".$bucketfile.": $!";
+        print XOGMERGEBUCKET "<Projects>\n" if not $self->buckets->{$bucketfile};
+        $self->buckets->{$bucketfile}++;
         $project->print(\*XOGMERGEBUCKET);
         close XOGMERGEBUCKET;
 }
@@ -105,7 +108,7 @@ sub prepare_output
 
 sub clean_old_buckets {
         my ($self) = @_;
-        system ("rm -f bucket-*.tmp");
+        #system ("rm -f bucket-*.tmp");
         $self->buckets({});
 }
 
@@ -162,23 +165,12 @@ sub cb_Save_Resource
         $res->paste(last_child => $resources); # ok
 }
 
-sub fix_cur_file
-{
-        my ($self) = @_;
-        my $f = $self->cur_file;
-        system "echo '<Projects>' > xyz";
-        system "cat $f >> xyz";
-        system "echo '</Projects>' >> xyz";
-        system "cat xyz > $f";
-}
-
 sub add_buckets_to_final
 {
         my ($self) = @_;
         foreach my $bucket (keys %{$self->buckets})
         {
                 $self->cur_file( $bucket );
-                $self->fix_cur_file;
                 $self->cur_proj( undef );
                 my $twig= XML::Twig->new (
                                           start_tag_handlers => { "Project"  => \&cb_Open_Project },
@@ -187,6 +179,15 @@ sub add_buckets_to_final
                 $twig->{_self} = $self;
                 $twig->parsefile( $bucket );
                 $self->add_project_to_final($self->cur_proj); # wrong duplicate
+        }
+}
+
+sub close_buckets_xml {
+        my ($self) = @_;
+        foreach my $bucketfile (keys %{$self->buckets}) {
+                open XOGMERGEBUCKET, ">>", $bucketfile or die "Cannot open bucket file ".$bucketfile.": $!";
+                print XOGMERGEBUCKET "</Projects>\n";
+                close XOGMERGEBUCKET;
         }
 }
 
@@ -200,6 +201,7 @@ sub collect_projects_to_buckets_or_final
                 $twig->{_self} = $self;
                 $twig->parsefile( $f );
         }
+        $self->close_buckets_xml;
 }
 
 sub pass2_merge
