@@ -9,3 +9,13 @@ blib\b
 t/00-suite-meta.t
 nytprof.out
 nytprof
+XOGMERGE.xml
+1002_QA_Feb09.xml
+1003_PS.xml
+1003_QA.xml
+1003_TJ.xml
+
+.~lock.*#
+PS_TEST.XML
+Clarity
+internal

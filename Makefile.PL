@@ -15,6 +15,9 @@ requires 'File::Find::Rule';
 requires 'Data::Dumper';
 requires 'XML::Twig';
 requires 'Moose';
+requires 'App::Cmd';
+
+par_base;
 
 install_script 'xogtool';
 
