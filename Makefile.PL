@@ -1,14 +1,14 @@
 use inc::Module::Install;
 
-name     'XOG-Merge';
-all_from 'lib/XOG/Merge.pm';
+name     'XOG';
+all_from 'lib/XOG.pm';
 author   'Steffen Schwigon <ss5@renormalist.net>';
 license  'perl';
 
 author_requires 'Module::Install::WriteAll';
 
-requires 'Test::More'; # [sic]
-requires 'Test::Deep'; # [sic]
+requires 'Test::More'; # [sic, for selftest]
+requires 'Test::Deep'; # [sic, for selftest]
 requires 'File::Temp';
 requires 'File::ShareDir';
 requires 'File::Find::Rule';

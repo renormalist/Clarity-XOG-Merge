@@ -37,7 +37,7 @@ to force overwrite an existing output file without asking then specify
 During the process a temporary directory is created, used, and cleaned
 up at the end.
 
-To self-test the xogtool use the 'xogtool selftest';
+To self-test the xogtool use the 'xogtool selftest'.;
 
 Options:"; }
 

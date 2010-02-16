@@ -1,7 +1,5 @@
 package XOG::Merge;
 
-our $VERSION = '0.01';
-
 use 5.010;
 use strict;
 use warnings;
@@ -23,7 +21,7 @@ has verbose       => ( is => "rw", default => 0 );
 has debug         => ( is => "rw", default => 0 );
 has force         => ( is => "rw", default => 0 );
 
-sub usage_desc { "xog <subcommand> [options]" }
+sub usage_desc { "xogtool <subcommand> [options] [files]" }
 
 sub TEMPLATE_HEADER {
         q#<!-- edited with Emacs 23 (http://emacswiki.org) by cris (na) -->
