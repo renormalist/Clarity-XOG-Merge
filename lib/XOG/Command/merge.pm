@@ -21,13 +21,21 @@ sub opt_spec
 
 sub abstract { "merge several files" }
 
+sub description {
+
+        "This merge will merge Clarity project files.
+
+You either specify the files to merge or by default it finds all files
+of name 'YYMM_XX.xml' where YY=year, MM=month, XX is the source (TJ
+for TaskJuggler, PS for Project Server and QA for QA tool).
+
+";
+}
+
 sub validate_args {
         my ($self, $opt, $args) = @_;
 
-}
-
-sub wanted_project_file {
-        
+        # no-op
 }
 
 sub find_local_project_files {

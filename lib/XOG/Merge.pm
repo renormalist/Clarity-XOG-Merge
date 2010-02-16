@@ -68,9 +68,9 @@ sub finish
 sub pass1_count
 {
         my ($self) = @_;
-        say "Pass 1: count" if $self->verbose || $self->debug;
+        say "Pass 1: count" if $self->verbose;
         foreach my $f ($self->files) {
-                say "Read file $f" if $self->verbose || $self->debug;
+                say "  Read file $f" if $self->verbose;
                 $self->cur_file( $f );
                 my $twig= XML::Twig->new
                     ( twig_handlers =>
@@ -121,6 +121,7 @@ sub finish_output
         my ($self) = @_;
         print XOGMERGEOUT TEMPLATE_FOOTER;
         close XOGMERGEOUT;
+        say "Out file: ", $self->out_file if $self->verbose;
 }
 
 sub cb_Save_Project
@@ -200,7 +201,7 @@ sub collect_projects_to_buckets_or_final
         my ($self) = @_;
         foreach my $f ($self->files)
         {
-                say "Read file $f" if $self->verbose || $self->debug;
+                say "  Read file $f" if $self->verbose;
                 $self->cur_file( $f );
                 my $twig= XML::Twig->new (twig_handlers => { 'Projects/Project' => \&cb_Save_Project });
                 $twig->{_self} = $self;
@@ -212,6 +213,7 @@ sub collect_projects_to_buckets_or_final
 sub pass2_merge
 {
         my ($self) = @_;
+        say "Pass 2: merge" if $self->verbose;
         $self->prepare_output;
         $self->clean_old_buckets;
         $self->collect_projects_to_buckets_or_final;
