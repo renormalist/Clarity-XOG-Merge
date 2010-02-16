@@ -171,8 +171,6 @@ sub cb_Save_Resource
         my ($t, $resource) = @_;
         my $self = $t->{_self};
 
-        state $res_counter = 0;
-
         my $resourceID = $resource->att('resourceID');
 
         my $resources = $self->cur_proj->first_child('Resources');
