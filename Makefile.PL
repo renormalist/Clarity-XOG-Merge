@@ -6,6 +6,9 @@ author   'Steffen Schwigon <ss5@renormalist.net>';
 license  'perl';
 
 author_requires 'Module::Install::WriteAll';
+author_requires 'Module::Install::PAR';
+author_requires 'PAR::Packer';
+author_requires 'PAR::Dist';
 
 requires 'Test::More'; # [sic, for selftest]
 requires 'Test::Deep'; # [sic, for selftest]
