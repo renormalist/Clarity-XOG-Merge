@@ -17,7 +17,7 @@ requires 'XML::Twig';
 requires 'Moose';
 requires 'App::Cmd';
 
-par_base;
+par_base "SCHWIGON";
 
 install_script 'xogtool';
 

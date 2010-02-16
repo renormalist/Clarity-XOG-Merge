@@ -20,6 +20,18 @@ my @projects = ();
 
 sub abstract { "built-in self test" }
 
+sub description {
+
+        "Built-in self test.
+
+Merge some self-contained dummy xml files into a temporary result file
+and executes plausibility checks.
+
+This is to check for general working, like XML parsing, create and
+cleanup temp files, etc.
+
+Expected output is some 'ok' lines and number of tests, eg. '1..4'."}
+
 sub cb_Resource {
         $counter_Resource++;
 }

@@ -24,14 +24,29 @@ sub abstract { "merge several files" }
 
 sub description {
 
-        "This merge will merge Clarity project files.
+        "Merge Clarity project files.
 
-You either specify the files to merge or by default it finds all files
-of name 'YYMM_XX.xml' where YY=year, MM=month, XX is the source (TJ
-for TaskJuggler, PS for Project Server and QA for QA tool).
+You either specify the files to merge or it finds all files
+'YYMM_XX.xml' where YY=year, MM=month, XX is the source (TJ for
+TaskJuggler, PS for Project Server and QA for QA tool).
 
-";
-}
+Specify an output file with -o, default is 'XOGMERGE.xml'. If you want
+to force overwrite an existing output file without asking then specify
+-f.
+
+During the process a temporary directory is created, used, and cleaned
+up at the end.
+
+To self-test the xogtool use the 'xogtool selftest';
+
+Options:"; }
+
+# The merge works as follows: In a first pass there is some XML element
+# counting through the source xml files; that's kind of an
+# optimization. In a 2nd pass all source xml files are read again, now
+# all contained projects are sorted into temporary files respectively
+# and then appended to final xml output file.
+
 
 sub validate_args {
         my ($self, $opt, $args) = @_;
