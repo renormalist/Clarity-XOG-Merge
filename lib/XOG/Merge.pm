@@ -9,17 +9,18 @@ use Data::Dumper;
 use XML::Twig;
 use Moose;
 
-has files         => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
-has projectids    => ( is => "rw", isa => "HashRef",  default => sub {{}} );
-has buckets       => ( is => "rw" );
-has cur_file      => ( is => "rw" );
-has cur_proj      => ( is => "rw" );
-has tmpdir        => ( is => "rw", default => sub { tempdir( CLEANUP => 1 ) });
-has out_file      => ( is => "rw", default => "XOGMERGE.xml" );
-has ALWAYSBUCKETS => ( is => "rw", default => 1 );
-has verbose       => ( is => "rw", default => 0 );
-has debug         => ( is => "rw", default => 0 );
-has force         => ( is => "rw", default => 0 );
+has files           => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
+has projectids      => ( is => "rw", isa => "HashRef",  default => sub {{}} );
+has finalprojectids => ( is => "rw", isa => "HashRef",  default => sub {{}} );
+has buckets         => ( is => "rw" );
+has cur_file        => ( is => "rw" );
+has cur_proj        => ( is => "rw" );
+has tmpdir          => ( is => "rw", default => sub { tempdir( CLEANUP => 1 ) });
+has out_file        => ( is => "rw", default => "XOGMERGE.xml" );
+has ALWAYSBUCKETS   => ( is => "rw", default => 1 );
+has verbose         => ( is => "rw", default => 0 );
+has debug           => ( is => "rw", default => 0 );
+has force           => ( is => "rw", default => 0 );
 
 sub usage_desc { "xogtool <subcommand> [options] [files]" }
 
@@ -27,8 +28,8 @@ sub TEMPLATE_HEADER {
         q#<!-- edited with Emacs 23 (http://emacswiki.org) by cris (na) -->
 <!--XOG XML from CA is prj_projects_alloc_act_etc_read. Created by xogtool -->
 <NikuDataBus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nikuxog_project.xsd">
-	<Header action="write" externalSource="NIKU" objectType="project" version="7.5.0" />
-	<Projects>
+<Header action="write" externalSource="NIKU" objectType="project" version="7.5.0" />
+<Projects>
 #
 }
 
@@ -231,12 +232,51 @@ sub pass2_merge
         $self->finish_output;
 }
 
+sub cb_Count_Project {
+        my ($t, $project) = @_;
+        my $self = $t->{_self};
+
+        my $projectID = $project->att('projectID');
+        my $name      = $project->att('name');
+
+        $self->finalprojectids->{$projectID}++;
+}
+
+sub pass3_validate {
+        my ($self) = @_;
+
+        say "Pass 3: validate" if $self->verbose;
+        say "  File ".$self->out_file if $self->verbose;
+        my $twig= XML::Twig->new (twig_handlers => { 'Projects/Project' => \&cb_Count_Project });
+        $twig->{_self} = $self;
+        $twig->parsefile( $self->out_file );
+
+        my $projectcount_in  = scalar keys %{$self->projectids};
+        my $projectcount_out = scalar keys %{$self->finalprojectids};
+        if ($projectcount_in == $projectcount_out) {
+                say "  OK - project count ($projectcount_in/$projectcount_out)" if $self->verbose;
+        } else {
+                say "  NOT OK - project count ($projectcount_in/$projectcount_out)" if $self->verbose;
+        }
+
+        foreach (keys %{$self->projectids}) {
+                if (exists $self->projectids->{$_}) {
+                        say "  OK - project $_" if $self->verbose;
+                } else {
+                        say "  NOT OK - project $_" if $self->verbose;
+                        exit 2;
+                }
+        }
+
+}
+
 sub Main
 {
         my ($self) = @_;
         $self->prepare;
         $self->pass1_count;
         $self->pass2_merge;
+        $self->pass3_validate;
         $self->finish();
 }
 

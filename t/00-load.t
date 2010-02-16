@@ -3,7 +3,7 @@
 use Test::More tests => 1;
 
 BEGIN {
-	use_ok( 'XOG::Merge' );
+	use_ok( 'XOG' );
 }
 
-diag( "Testing XOG::Merge $XOG::Merge::VERSION, Perl $], $^X" );
+diag( "Testing XOG $XOG::VERSION, Perl $], $^X" );
