@@ -7,10 +7,14 @@ license  'perl';
 
 author_requires 'Module::Install::WriteAll';
 
-build_requires 'Test::More';
-
+requires 'Test::More'; # [sic]
+requires 'Test::Deep'; # [sic]
+requires 'File::Temp';
+requires 'File::ShareDir';
+requires 'File::Find::Rule';
+requires 'Data::Dumper';
 requires 'XML::Twig';
-requires 'MooseX::Declare';
+requires 'Moose';
 
 install_script 'xogtool';
 
