@@ -39,6 +39,8 @@ sub validate_args {
 }
 
 sub find_local_project_files {
+        my ($self, $opt, $args) = @_;
+
         # YYMM_XX.xml
         # where
         #       YY = year,
@@ -48,8 +50,12 @@ sub find_local_project_files {
         #  PS for Project Server and
         #  QA for QA tool)
 
-        my @files = File::Find::Rule->file()->name( '*.xml' )->in( "." );
-        return;#('t/QA.xml', 't/PS.xml', 't/TJ.xml');
+        my @files = grep { /\d{2}[01]\d_(TJ|PS|QA)\.xml/i } File::Find::Rule->file()->name( '????_??.*' )->in( "." );
+        if ($opt->{verbose}) {
+                say "Merge files:";
+                say "  $_" foreach @files;
+        }
+        return \@files;
 }
 
 sub execute {
@@ -59,11 +65,11 @@ sub execute {
         print STDERR "args: ", Dumper($args) if $opt->{debug};
 
         my $out_file = $opt->{out} || 't/xog-out.xml';
-        my @files    = @$args || $self->find_local_project_files;
+        my $files    = scalar @$args ? $args : $self->find_local_project_files($opt, $args);
 
         my $merger = XOG::Merge->new
             (
-             files    => \@files,
+             files    => $files,
              out_file => $out_file,
              verbose  => $opt->{verbose},
              debug    => $opt->{debug},

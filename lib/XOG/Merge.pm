@@ -25,8 +25,7 @@ has debug         => ( is => "rw", default => 0 );
 sub usage_desc { "xog <subcommand> [options]" }
 
 sub TEMPLATE_HEADER {
-        q#
-<!-- edited with Emacs 23 (http://emacswiki.org) by cris (na) -->
+        q#<!-- edited with Emacs 23 (http://emacswiki.org) by cris (na) -->
 <!--XOG XML from CA is prj_projects_alloc_act_etc_read. Created by xogtool -->
 <NikuDataBus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nikuxog_project.xsd">
 	<Header action="write" externalSource="NIKU" objectType="project" version="7.5.0" />
