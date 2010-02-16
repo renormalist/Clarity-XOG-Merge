@@ -17,7 +17,7 @@ has buckets       => ( is => "rw" );
 has cur_file      => ( is => "rw" );
 has cur_proj      => ( is => "rw" );
 has tmpdir        => ( is => "rw", default => sub { tempdir( CLEANUP => 1 ) });
-has out_file      => ( is => "rw", default => "OUTFILE.xml" );
+has out_file      => ( is => "rw", default => "XOGMERGE.xml" );
 has ALWAYSBUCKETS => ( is => "rw", default => 1 );
 has verbose       => ( is => "rw", default => 0 );
 has debug         => ( is => "rw", default => 0 );

@@ -13,7 +13,7 @@ use File::Find::Rule;
 sub opt_spec
 {
         (
-         [ "out|o=s",    "Write result to that file", { default => "XOGMERGE.out" } ],
+         [ "out|o=s",    "Write result to that file", { default => "XOGMERGE.xml" } ],
          [ "verbose|v",  "Be verbose",                { default => 0 } ],
          [ "debug|d",    "Output debugging info",     { default => 0 } ],
         );
