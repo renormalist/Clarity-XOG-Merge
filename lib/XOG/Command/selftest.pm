@@ -1,11 +1,10 @@
 package XOG::Command::selftest;
 
-use 5.010;
 use strict;
 use warnings;
+
 use Test::More;
 use Test::Deep;
-
 use XOG -command;
 use XOG::Merge;
 

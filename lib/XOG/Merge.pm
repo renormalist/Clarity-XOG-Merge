@@ -1,6 +1,5 @@
 package XOG::Merge;
 
-use 5.010;
 use strict;
 use warnings;
 
@@ -67,9 +66,9 @@ sub finish
 sub pass1_count
 {
         my ($self) = @_;
-        say "Pass 1: count" if $self->verbose;
+        print "Pass 1: count\n" if $self->verbose;
         foreach my $f ($self->files) {
-                say "  Read file $f" if $self->verbose;
+                print "  Read file $f\n" if $self->verbose;
                 $self->cur_file( $f );
                 my $twig= XML::Twig->new
                     ( twig_handlers =>
@@ -112,10 +111,10 @@ sub prepare_output
                 print "Output file '".$self->out_file."' exists. Overwrite (y/N)? ";
                 read STDIN, $answer, 1;
                 if ($answer !~ m/^y/i) {
-                        say "Keep ".$self->out_file." and exit." if $self->verbose;
+                        print "Keep ".$self->out_file." and exit.\n" if $self->verbose;
                         exit 1;
                 }
-                say "Ok, overwrite ".$self->out_file."." if $self->verbose;
+                print "Ok, overwrite ".$self->out_file.".\n" if $self->verbose;
         }
         open XOGMERGEOUT, ">", $self->out_file or die "Cannot open out file ".$self->out_file.": $!";
         print XOGMERGEOUT TEMPLATE_HEADER;
@@ -132,7 +131,7 @@ sub finish_output
         my ($self) = @_;
         print XOGMERGEOUT TEMPLATE_FOOTER;
         close XOGMERGEOUT;
-        say "Out file: ", $self->out_file if $self->verbose;
+        print "Out file: ".$self->out_file."\n" if $self->verbose;
 }
 
 sub cb_Save_Project
@@ -212,7 +211,7 @@ sub collect_projects_to_buckets_or_final
         my ($self) = @_;
         foreach my $f ($self->files)
         {
-                say "  Read file $f" if $self->verbose;
+                print "  Read file $f\n" if $self->verbose;
                 $self->cur_file( $f );
                 my $twig= XML::Twig->new (twig_handlers => { 'Projects/Project' => \&cb_Save_Project });
                 $twig->{_self} = $self;
@@ -224,7 +223,7 @@ sub collect_projects_to_buckets_or_final
 sub pass2_merge
 {
         my ($self) = @_;
-        say "Pass 2: merge" if $self->verbose;
+        print "Pass 2: merge\n" if $self->verbose;
         $self->prepare_output;
         $self->clean_old_buckets;
         $self->collect_projects_to_buckets_or_final;
@@ -245,8 +244,8 @@ sub cb_Count_Project {
 sub pass3_validate {
         my ($self) = @_;
 
-        say "Pass 3: validate" if $self->verbose;
-        say "  File ".$self->out_file if $self->verbose;
+        print "Pass 3: validate\n" if $self->verbose;
+        print "  File ".$self->out_file."\n" if $self->verbose;
         my $twig= XML::Twig->new (twig_handlers => { 'Projects/Project' => \&cb_Count_Project });
         $twig->{_self} = $self;
         $twig->parsefile( $self->out_file );
@@ -254,16 +253,16 @@ sub pass3_validate {
         my $projectcount_in  = scalar keys %{$self->projectids};
         my $projectcount_out = scalar keys %{$self->finalprojectids};
         if ($projectcount_in == $projectcount_out) {
-                say "  OK - project count ($projectcount_in/$projectcount_out)" if $self->verbose;
+                print "  OK - project count ($projectcount_in/$projectcount_out)\n" if $self->verbose;
         } else {
-                say "  NOT OK - project count ($projectcount_in/$projectcount_out)" if $self->verbose;
+                print "  NOT OK - project count ($projectcount_in/$projectcount_out)\n" if $self->verbose;
         }
 
         foreach (keys %{$self->projectids}) {
                 if (exists $self->projectids->{$_}) {
-                        say "  OK - project $_" if $self->verbose;
+                        print "  OK - project $_\n" if $self->verbose;
                 } else {
-                        say "  NOT OK - project $_" if $self->verbose;
+                        print "  NOT OK - project $_\n" if $self->verbose;
                         exit 2;
                 }
         }

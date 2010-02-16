@@ -1,6 +1,5 @@
 package XOG::Command::merge;
 
-use 5.010;
 use strict;
 use warnings;
 
@@ -68,8 +67,8 @@ sub find_local_project_files {
 
         my @files = grep { /\d{2}[01]\d_(TJ|PS|QA)\.xml/i } File::Find::Rule->file()->name( '????_??.*' )->in( "." );
         if ($opt->{verbose}) {
-                say "Merge files:";
-                say "  $_" foreach @files;
+                print "Merge files:\n";
+                print "  $_\n" foreach @files;
         }
         return \@files;
 }
