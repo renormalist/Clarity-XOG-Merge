@@ -21,6 +21,7 @@ has out_file      => ( is => "rw", default => "XOGMERGE.xml" );
 has ALWAYSBUCKETS => ( is => "rw", default => 1 );
 has verbose       => ( is => "rw", default => 0 );
 has debug         => ( is => "rw", default => 0 );
+has force         => ( is => "rw", default => 0 );
 
 sub usage_desc { "xog <subcommand> [options]" }
 
@@ -105,6 +106,18 @@ sub add_project_to_bucket
 sub prepare_output
 {
         my ($self) = @_;
+
+        my $answer = 'n';
+
+        if (-e $self->out_file and not $self->force) {
+                print "Output file '".$self->out_file."' exists. Overwrite (y/N)? ";
+                read STDIN, $answer, 1;
+                if ($answer !~ m/^y/i) {
+                        say "Keep ".$self->out_file." and exit." if $self->verbose;
+                        exit 1;
+                }
+                say "Ok, overwrite ".$self->out_file."." if $self->verbose;
+        }
         open XOGMERGEOUT, ">", $self->out_file or die "Cannot open out file ".$self->out_file.": $!";
         print XOGMERGEOUT TEMPLATE_HEADER;
 }

@@ -13,9 +13,10 @@ use File::Find::Rule;
 sub opt_spec
 {
         (
-         [ "out|o=s",    "Write result to that file", { default => "XOGMERGE.xml" } ],
-         [ "verbose|v",  "Be verbose",                { default => 0 } ],
-         [ "debug|d",    "Output debugging info",     { default => 0 } ],
+         [ "out|o=s",    "Write result to that file",                { default => "XOGMERGE.xml" } ],
+         [ "verbose|v",  "Be verbose",                               { default => 0 } ],
+         [ "debug|d",    "Output debugging info",                    { default => 0 } ],
+         [ "force|f",    "Force overwrite of existing output file.", { default => 0 } ],
         );
 }
 
@@ -73,6 +74,7 @@ sub execute {
              out_file => $out_file,
              verbose  => $opt->{verbose},
              debug    => $opt->{debug},
+             force    => $opt->{force},
             );
         $merger->Main;
 }
