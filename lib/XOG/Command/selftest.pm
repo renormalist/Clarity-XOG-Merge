@@ -8,7 +8,7 @@ use Test::Deep;
 use XOG -command;
 use XOG::Merge;
 
-use File::ShareDir qw(module_dir);
+use File::ShareDir::PAR qw(module_dir);
 use File::Temp qw(tempfile tempdir);
 
 # ----- evaluate result -----
