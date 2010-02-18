@@ -1,3 +1,7 @@
+package XOG::Cargo::Test::TJ;
+
+1;
+__DATA__
 <!-- edited with Emacs 23 (http://emacswiki.org) by cris (na) -->
 <!--XOG XML from CA is prj_projects_alloc_act_etc_read.  Edited by Karola Brandes to test XOG-In for project resource allocations-->
 <NikuDataBus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nikuxog_project.xsd">
