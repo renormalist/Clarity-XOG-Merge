@@ -29,14 +29,14 @@ sub description {
   You either specify the files to merge or it finds all *.xml files
   either in local directory or the directory you specified with -i.
 
-  Specify an output file with -o, default is 'XOGMERGE.xml'. If you
-  want to force overwrite an existing output file without asking then
-  specify -f.
+  Specify an output file with -o, default is 'XOGMERGE.xml' in current
+  directory. If you want to force overwrite an existing output file
+  without asking then specify -f.
 
   During the process a temporary directory is created, used, and
   cleaned up at the end.
 
-  To self-test the xogtool use the 'xogtool selftest'.;
+  To self-test the xogtool use the 'xogtool selftest'.
 
 Options:"; }
 
