@@ -31,7 +31,8 @@ sub TEMPLATE_HEADER {
 }
 
 sub TEMPLATE_FOOTER {
-        q# </Projects>
+        q#
+ </Projects>
 </NikuDataBus>
 #
 }

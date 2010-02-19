@@ -12,10 +12,11 @@ use File::Find::Rule;
 sub opt_spec
 {
         (
-         [ "out|o=s",    "Write result to that file",                { default => "XOGMERGE.xml" } ],
-         [ "verbose|v",  "Be verbose",                               { default => 0 } ],
-         [ "debug|d",    "Output debugging info",                    { default => 0 } ],
-         [ "force|f",    "Force overwrite of existing output file.", { default => 0 } ],
+         [ "out|o=s",    "Write result to that file",                 { default => "XOGMERGE.xml" } ],
+         [ "in|i=s",     "Search default input files in that subdir", { default => "." } ],
+         [ "verbose|v",  "Be verbose",                                { default => 0 } ],
+         [ "debug|d",    "Output debugging info",                     { default => 0 } ],
+         [ "force|f",    "Force overwrite of existing output file.",  { default => 0 } ],
         );
 }
 
@@ -25,18 +26,17 @@ sub description {
 
         "  Merge Clarity project files.
 
-  You either specify the files to merge or it finds all files
-  'YYMM_XX.xml' where YY=year, MM=month, XX is the source (TJ for
-  TaskJuggler, PS for Project Server and QA for QA tool).
+  You either specify the files to merge or it finds all *.xml files
+  either in local directory or the directory you specified with -i.
 
-  Specify an output file with -o, default is 'XOGMERGE.xml'. If you
-  want to force overwrite an existing output file without asking then
-  specify -f.
+  Specify an output file with -o, default is 'XOGMERGE.xml' in current
+  directory. If you want to force overwrite an existing output file
+  without asking then specify -f.
 
   During the process a temporary directory is created, used, and
   cleaned up at the end.
 
-  To self-test the xogtool use the 'xogtool selftest'.;
+  To self-test the xogtool use the 'xogtool selftest'.
 
 Options:"; }
 
@@ -54,18 +54,17 @@ sub validate_args {
 }
 
 sub find_local_project_files {
-        my ($self, $opt, $args) = @_;
+        my ($self, $opt, $args, $out_file) = @_;
 
-        # YYMM_XX.xml
-        # where
-        #       YY = year,
-        #       MM = month,
-        #       XX is the source
-        # (TJ for TaskJuggler,
-        #  PS for Project Server and
-        #  QA for QA tool)
+        my $in_dir   = $opt->{in};
 
-        my @files = grep { /\d{2}[01]\d_(TJ|PS|QA)\.xml/i } File::Find::Rule->file()->name( '????_??.*' )->in( "." );
+        my @files =
+            grep { $_ ne $out_file }
+            File::Find::Rule
+                        ->maxdepth(1)
+                        ->file
+                        ->name('*.XML', '*.xml')
+                        ->in($in_dir);
         if ($opt->{verbose}) {
                 print "Merge files:\n";
                 print "  $_\n" foreach @files;
@@ -80,7 +79,7 @@ sub execute {
         print STDERR "args: ", Dumper($args) if $opt->{debug};
 
         my $out_file = $opt->{out} || 't/xog-out.xml';
-        my $files    = scalar @$args ? $args : $self->find_local_project_files($opt, $args);
+        my $files    = scalar @$args ? $args : $self->find_local_project_files($opt, $args, $out_file);
 
         my $merger = XOG::Merge->new
             (
