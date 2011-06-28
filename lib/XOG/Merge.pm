@@ -1,4 +1,4 @@
-package XOG::Merge;
+package Clarity::XOG::Merge;
 
 use strict;
 use warnings;
@@ -275,7 +275,7 @@ sub Main
         $self->finish();
 }
 
-1; # End of XOG::Merge
+1; # End of Clarity::XOG::Merge
 
 __END__
 
@@ -283,14 +283,14 @@ __END__
 
 =head1 NAME
 
-XOG::Merge - Merge several Clarity XML Open Gateway (XOG) files
+Clarity::XOG::Merge - Merge several Clarity XML Open Gateway (XOG) files
 
 =head1 SYNOPSIS
 
 Merge several Clarity XOG ("XML Open Gateway") files into one
 
-    use XOG::Merge;
-    my $merger = XOG::Merge->new
+    use Clarity::XOG::Merge;
+    my $merger = Clarity::XOG::Merge->new
                  ( files    => ['t/QA.xml', 't/PS.xml', 't/TJ.xml'],
                    out_file => $out_file );
     $merger->Main;
@@ -310,7 +310,7 @@ make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc XOG::Merge
+    perldoc Clarity::XOG::Merge
 
 =head1 COPYRIGHT & LICENSE
 

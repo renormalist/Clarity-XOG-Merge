@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Deep;
 use XOG -command;
-use XOG::Merge;
+use Clarity::XOG::Merge;
 
 use File::Temp qw(tempfile tempdir);
 
@@ -79,7 +79,7 @@ sub execute {
         my $srcdir = prepare_srcdir;
         my $tmpdir = tempdir( CLEANUP => 1 );
         my $out_file = "$tmpdir/tmp_OUTFILE.xml";
-        my $merger = XOG::Merge->new( files => ["$srcdir/QA.xml",
+        my $merger = Clarity::XOG::Merge->new( files => ["$srcdir/QA.xml",
                                                 "$srcdir/PS.xml",
                                                 "$srcdir/TJ.xml"],
                                       out_file => $out_file

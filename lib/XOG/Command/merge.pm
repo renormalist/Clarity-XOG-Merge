@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use XOG -command;
-use XOG::Merge;
+use Clarity::XOG::Merge;
 
 use Data::Dumper;
 use File::Find::Rule;
@@ -81,7 +81,7 @@ sub execute {
         my $out_file = $opt->{out} || 't/xog-out.xml';
         my $files    = scalar @$args ? $args : $self->find_local_project_files($opt, $args, $out_file);
 
-        my $merger = XOG::Merge->new
+        my $merger = Clarity::XOG::Merge->new
             (
              files    => $files,
              out_file => $out_file,
