@@ -1,4 +1,4 @@
-package XOG::Command::selftest;
+package Clarity::XOG::Command::selftest;
 
 use strict;
 use warnings;

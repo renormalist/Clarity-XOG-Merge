@@ -1,4 +1,4 @@
-package XOG::Command::commands;
+package Clarity::XOG::Command::commands;
 
 use strict;
 use warnings;

@@ -1,4 +1,4 @@
-package XOG::Command::merge;
+package Clarity::XOG::Command::merge;
 
 use strict;
 use warnings;
