@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use XOG::Merge;
+use Clarity::XOG::Merge;
 use Test::More;
 use Test::Deep;
 
@@ -10,10 +10,10 @@ use File::Temp qw(tempfile tempdir);
 
 # ----- merge -----
 
-my $srcdir = module_dir('XOG::Merge')."/testfiles";
+my $srcdir = module_dir('Clarity::XOG::Merge')."/testfiles";
 my $tmpdir = tempdir( CLEANUP => 1 );
 my $out_file = "$tmpdir/tmp_OUTFILE.xml";
-my $merger = XOG::Merge->new (
+my $merger = Clarity::XOG::Merge->new (
                               files => ["$srcdir/QA.xml", "$srcdir/PS.xml", "$srcdir/TJ.xml"],
                               out_file => $out_file
                              );
