@@ -1,5 +1,11 @@
 package Clarity::XOG::Cargo::Test::PS;
 
+=head1 NAME
+
+Clarity::XOG::Cargo::Test::PS - Container for cargo __DATA__
+
+=cut
+
 1;
 __DATA__
 <!-- edited with Emacs 23 (http://emacswiki.org) by cris (na) -->

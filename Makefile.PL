@@ -1,6 +1,9 @@
+use strict;
+use warnings;
+
 use inc::Module::Install;
 
-name     'XOG';
+name     'Clarity-XOG-Merge';
 all_from 'lib/Clarity/XOG.pm';
 author   'Steffen Schwigon <ss5@renormalist.net>';
 license  'perl';
@@ -24,5 +27,8 @@ requires 'App::Cmd';
 install_script 'xogtool';
 
 auto_install;
+
+repository 'git://github.com/lhm/Clarity-XOG-Merge.git';
+bugtracker 'http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Clarity-XOG-Merge';
 
 WriteAll;

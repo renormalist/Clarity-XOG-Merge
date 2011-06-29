@@ -109,3 +109,39 @@ sub execute {
 
 1;
 
+__END__
+
+=pod
+
+=head1 NAME
+
+Clarity::XOG::Command::selftest - xogtool subcommand 'selftest'
+
+=head1 ABOUT
+
+This is the class for C<xogtool selftest>. It runs a self-test, useful
+if the developer needs information from a user who has problems with
+the tool.
+
+See also L<xogtool|xogtool> for details.
+
+=head1 AUTHOR
+
+Steffen Schwigon, C<< <ss5 at renormalist.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-clarity-xog-merge
+at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Clarity-XOG-Merge>. I
+will be notified, and then you'll automatically be notified of
+progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010-2011 Steffen Schwigon, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
