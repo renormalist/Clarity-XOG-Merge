@@ -1,4 +1,4 @@
 #! /usr/bin/env perl
 
-use XOG;
-XOG->run;
+use Clarity::XOG;
+Clarity::XOG->run;
