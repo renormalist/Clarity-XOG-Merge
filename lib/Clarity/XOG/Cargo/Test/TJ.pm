@@ -1,4 +1,4 @@
-package XOG::Cargo::Test::TJ;
+package Clarity::XOG::Cargo::Test::TJ;
 
 1;
 __DATA__

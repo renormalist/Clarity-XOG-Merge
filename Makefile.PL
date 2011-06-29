@@ -1,7 +1,7 @@
 use inc::Module::Install;
 
 name     'XOG';
-all_from 'lib/XOG.pm';
+all_from 'lib/Clarity/XOG.pm';
 author   'Steffen Schwigon <ss5@renormalist.net>';
 license  'perl';
 

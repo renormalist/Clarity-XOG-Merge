@@ -1,4 +1,4 @@
-package XOG::Cargo::Test::QA;
+package Clarity::XOG::Cargo::Test::QA;
 
 1;
 __DATA__

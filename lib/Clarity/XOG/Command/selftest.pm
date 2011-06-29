@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::Deep;
-use XOG -command;
+use Clarity::XOG -command;
 use Clarity::XOG::Merge;
 
 use File::Temp qw(tempfile tempdir);
@@ -49,9 +49,9 @@ sub cb_CustomInformation {
         $counter_CustomInformation++;
 }
 
-use XOG::Cargo::Test::QA;
-use XOG::Cargo::Test::PS;
-use XOG::Cargo::Test::TJ;
+use Clarity::XOG::Cargo::Test::QA;
+use Clarity::XOG::Cargo::Test::PS;
+use Clarity::XOG::Cargo::Test::TJ;
 
 sub prepare_srcdir {
         my $srcdir = tempdir( CLEANUP => 1 );
@@ -61,15 +61,15 @@ sub prepare_srcdir {
         my $file_TJ = "$srcdir/TJ.xml";
 
         open TESTDATA, ">", $file_QA or die "Can not write to $file_QA";
-        print TESTDATA $_ while <XOG::Cargo::Test::QA::DATA>;
+        print TESTDATA $_ while <Clarity::XOG::Cargo::Test::QA::DATA>;
         close TESTDATA;
 
         open TESTDATA, ">", $file_PS or die "Can not write to $file_PS";
-        print TESTDATA $_ while <XOG::Cargo::Test::PS::DATA>;
+        print TESTDATA $_ while <Clarity::XOG::Cargo::Test::PS::DATA>;
         close TESTDATA;
 
         open TESTDATA, ">", $file_TJ or die "Can not write to $file_TJ";
-        print TESTDATA $_ while <XOG::Cargo::Test::TJ::DATA>;
+        print TESTDATA $_ while <Clarity::XOG::Cargo::Test::TJ::DATA>;
         close TESTDATA;
 
         return $srcdir;

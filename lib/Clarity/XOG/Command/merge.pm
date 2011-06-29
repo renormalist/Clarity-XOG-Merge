@@ -3,7 +3,7 @@ package Clarity::XOG::Command::merge;
 use strict;
 use warnings;
 
-use XOG -command;
+use Clarity::XOG -command;
 use Clarity::XOG::Merge;
 
 use Data::Dumper;
