@@ -10,8 +10,6 @@ author_requires 'Module::Install::WriteAll';
 requires 'Test::More'; # [sic, for selftest]
 requires 'Test::Deep'; # [sic, for selftest]
 requires 'File::Temp';
-requires 'File::ShareDir';
-requires 'File::ShareDir::PAR';
 requires 'File::Find::Rule';
 requires 'Data::Dumper';
 requires 'XML::Twig';

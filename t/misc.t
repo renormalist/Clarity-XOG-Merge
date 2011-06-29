@@ -5,7 +5,6 @@ use Clarity::XOG::Merge;
 use Test::More;
 use Test::Deep;
 
-use File::ShareDir qw(module_dir);
 use File::Temp qw(tempfile tempdir);
 
 # ----- prepare -----
