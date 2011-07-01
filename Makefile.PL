@@ -4,7 +4,7 @@ use warnings;
 use inc::Module::Install;
 
 name     'Clarity-XOG-Merge';
-all_from 'lib/Clarity/XOG.pm';
+all_from 'lib/Clarity/XOG/Merge.pm';
 author   'Steffen Schwigon <ss5@renormalist.net>';
 license  'perl';
 

@@ -1,5 +1,6 @@
 package Clarity::XOG::Merge;
 
+use 5.008;
 use strict;
 use warnings;
 
@@ -7,6 +8,8 @@ use File::Temp qw(tempfile tempdir);
 use Data::Dumper;
 use XML::Twig;
 use Moose;
+
+our $VERSION = '1.001';
 
 has files           => ( is => "rw", isa => "ArrayRef", default => sub {[]}, auto_deref => 1 );
 has projectids      => ( is => "rw", isa => "HashRef",  default => sub {{}} );
