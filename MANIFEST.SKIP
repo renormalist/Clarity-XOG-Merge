@@ -14,9 +14,8 @@ XOGMERGE.xml
 1003_PS.xml
 1003_QA.xml
 1003_TJ.xml
-
+Clarity-XOG-Merge-*.*.tar.gz
 .~lock.*#
 PS_TEST.XML
-Clarity
 internal
 xogtool.exe
