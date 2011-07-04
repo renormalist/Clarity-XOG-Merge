@@ -319,7 +319,7 @@ be merged into one before being imported into the central Clarity
 database.
 
 This module L<Clarity::XOG::Merge|Clarity::XOG::Merge> and its
-frontend tool B<xogtool>) provide that merging.
+frontend tool B<xogtool> provide that merging.
 
 It is implemented carefully to handle very large files without
 suffering from memory issues (by using L<XML::Twig|XML::Twig>, temp

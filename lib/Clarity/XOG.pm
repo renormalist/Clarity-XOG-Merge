@@ -28,7 +28,7 @@ Clarity::XOG - xogtool utility base class
 =head1 ABOUT
 
 This is the base class for the C<xogtool> utility based on
-L<App::Command|App::Command>.
+L<App::Cmd|App::Cmd>.
 
 =head1 AUTHOR
 
